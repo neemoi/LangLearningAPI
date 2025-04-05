@@ -1,9 +1,12 @@
 using Application.Mapping;
-using Application.Services.Implementations.Auth.JWT;
+using Application.MappingProfile;
+using Application.Services.Implementations;
 using Application.Services.Implementations.Auth;
+using Application.Services.Implementations.Auth.JWT;
+using Application.Services.Implementations.Lesson;
 using Application.Services.Interfaces.IRepository;
-using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices;
+using Application.Services.Interfaces.IServices.Auth;
 using Application.UnitOfWork;
 using Domain.Models;
 using Infrastructure.Data;
@@ -11,11 +14,10 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Persistance.Repositories;
+using Persistance.Repository;
 using Persistance.UnitOfWork;
 using System.Text;
-using Application.MappingProfile;
-using Application.Services.Implementations;
-using Persistance.Repositories;
 
 internal class Program
 {
@@ -26,7 +28,7 @@ internal class Program
         builder.Services.AddDbContext<LanguageLearningDbContext>(options =>
             options.UseMySql(
                 builder.Configuration.GetConnectionString("DefaultConnection"),
-                new MySqlServerVersion(new Version(8, 0, 26))
+                new MySqlServerVersion(new Version(8, 0, 28))
             ));
 
         builder.Services.AddIdentity<Users, IdentityRole>()
@@ -72,23 +74,27 @@ internal class Program
 
         builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile));
 
-
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
+        builder.Services.AddScoped<ILessonRepository, LessonRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
         builder.Services.AddScoped<IJwtService, JwtService>();
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IUserService, UserService>();
+        builder.Services.AddScoped<ILessonService, LessonService>();
 
         var app = builder.Build();
 
-        using (var scope = app.Services.CreateScope())
-        {
-            var serviceProvider = scope.ServiceProvider;
-            await SeedData(serviceProvider);
-        }
+        //Migration
+        //using (var scope = app.Services.CreateScope())
+        //{
+        //    var db = scope.ServiceProvider.GetRequiredService<LanguageLearningDbContext>();
+        //    db.Database.Migrate();
+
+        //    await SeedData(scope.ServiceProvider);
+        //}
 
         if (app.Environment.IsDevelopment())
         {
@@ -97,12 +103,9 @@ internal class Program
         }
 
         app.UseHttpsRedirection();
-
         app.UseAuthentication();
         app.UseAuthorization();
-
         app.MapControllers();
-
         app.Run();
     }
 

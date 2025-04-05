@@ -9,7 +9,9 @@
         public string? Description { get; set; }
         
         public string? VideoUrl { get; set; }
-        
+
+        public string? PdfUrl { get; set; }
+
         public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
 
 

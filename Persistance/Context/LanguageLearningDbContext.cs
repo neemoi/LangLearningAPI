@@ -91,9 +91,12 @@ namespace Infrastructure.Data
             modelBuilder.Entity<Users>()
                 .HasIndex(u => u.Email)
                 .IsUnique();
-            
-            modelBuilder.Entity<Lesson>()
-                .HasIndex(l => l.Title);
+
+            modelBuilder.Entity<Lesson>(entity =>
+            {
+                entity.HasIndex(l => l.Title);
+                entity.HasIndex(l => l.PdfUrl);
+            });
 
             modelBuilder.Entity<Quiz>()
                 .HasIndex(q => q.LessonId);

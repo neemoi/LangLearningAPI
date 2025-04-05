@@ -12,6 +12,8 @@ namespace Application.UnitOfWork
 
         public IAuthEmailService AuthEmailService { get; }
 
+        public ILessonRepository LessonRepository { get; }
+
         public IJwtService JwtService{ get; }
 
         Task SaveChangesAsync();

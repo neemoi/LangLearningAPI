@@ -1,6 +1,6 @@
 ﻿using Application.DtoModels.Lessons.Lessons;
 using Application.DtoModels.Lessons.Quiz;
-using Application.Services.Interfaces.IServices;
+using Application.Services.Interfaces.IServices.Lesons;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LangLearningAPI.Controllers.Lessons

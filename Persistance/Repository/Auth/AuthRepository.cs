@@ -1,5 +1,5 @@
 ﻿using Application.DtoModels.Auth;
-using Application.Services.Interfaces.IRepository;
+using Application.Services.Interfaces.IRepository.Auth;
 using AutoMapper;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;

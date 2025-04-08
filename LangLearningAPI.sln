@@ -1,11 +1,13 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
-VisualStudioVersion = 17.12.35514.174 d17.12
+VisualStudioVersion = 17.12.35514.174
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "LangLearningAPI", "LangLearningAPI\LangLearningAPI.csproj", "{69679DA3-C5BD-4E39-A058-3250B410BFE2}"
 	ProjectSection(ProjectDependencies) = postProject
+		{9425AF04-A524-47F8-BCFD-CF706AC9A962} = {9425AF04-A524-47F8-BCFD-CF706AC9A962}
 		{B9C0470A-C13C-42E5-B12C-6116221E5B8F} = {B9C0470A-C13C-42E5-B12C-6116221E5B8F}
+		{DDBE404B-37B9-4BEB-8DA4-FAFE424CE423} = {DDBE404B-37B9-4BEB-8DA4-FAFE424CE423}
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Core", "Core", "{DD6CD9B1-B73D-4F04-A0B8-29C266BF5FE1}"
@@ -16,15 +18,22 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Presentation", "Presentatio
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Application", "Application\Application.csproj", "{787D9E88-C50B-4672-80F3-6659EAA6A3A2}"
 	ProjectSection(ProjectDependencies) = postProject
+		{9425AF04-A524-47F8-BCFD-CF706AC9A962} = {9425AF04-A524-47F8-BCFD-CF706AC9A962}
 		{DDBE404B-37B9-4BEB-8DA4-FAFE424CE423} = {DDBE404B-37B9-4BEB-8DA4-FAFE424CE423}
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Domain", "Domain\Domain.csproj", "{DDBE404B-37B9-4BEB-8DA4-FAFE424CE423}"
+	ProjectSection(ProjectDependencies) = postProject
+		{9425AF04-A524-47F8-BCFD-CF706AC9A962} = {9425AF04-A524-47F8-BCFD-CF706AC9A962}
+	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Persistance", "Persistance\Persistance.csproj", "{B9C0470A-C13C-42E5-B12C-6116221E5B8F}"
 	ProjectSection(ProjectDependencies) = postProject
 		{787D9E88-C50B-4672-80F3-6659EAA6A3A2} = {787D9E88-C50B-4672-80F3-6659EAA6A3A2}
+		{9425AF04-A524-47F8-BCFD-CF706AC9A962} = {9425AF04-A524-47F8-BCFD-CF706AC9A962}
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Common", "Common\Common.csproj", "{9425AF04-A524-47F8-BCFD-CF706AC9A962}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -48,6 +57,10 @@ Global
 		{B9C0470A-C13C-42E5-B12C-6116221E5B8F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B9C0470A-C13C-42E5-B12C-6116221E5B8F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B9C0470A-C13C-42E5-B12C-6116221E5B8F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9425AF04-A524-47F8-BCFD-CF706AC9A962}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9425AF04-A524-47F8-BCFD-CF706AC9A962}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9425AF04-A524-47F8-BCFD-CF706AC9A962}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9425AF04-A524-47F8-BCFD-CF706AC9A962}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

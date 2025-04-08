@@ -3,10 +3,14 @@ using Application.MappingProfile;
 using Application.Services.Implementations;
 using Application.Services.Implementations.Auth;
 using Application.Services.Implementations.Auth.JWT;
-using Application.Services.Implementations.Lesson;
-using Application.Services.Interfaces.IRepository;
-using Application.Services.Interfaces.IServices;
+using Application.Services.Implementations.Lesson.Lessons;
+using Application.Services.Implementations.Lesson.Words;
+using Application.Services.Interfaces.IRepository.Auth;
+using Application.Services.Interfaces.IRepository.Lesons;
+using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
+using Application.Services.Interfaces.IServices.Lesons;
+using Application.Services.Interfaces.IServices.Profile;
 using Application.UnitOfWork;
 using Domain.Models;
 using Infrastructure.Data;
@@ -14,8 +18,9 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
-using Persistance.Repositories;
-using Persistance.Repository;
+using Persistance.Repository.Lesons.Leson;
+using Persistance.Repository.Lesons.Words;
+using Persistance.Repository.Userfsf;
 using Persistance.UnitOfWork;
 using System.Text;
 
@@ -72,11 +77,12 @@ internal class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddLogging();
 
-        builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile));
+        builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile), typeof(MappingLessonWordProfile));
 
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<ILessonRepository, LessonRepository>();
+        builder.Services.AddScoped<ILessonWordRepository, LessonWordRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -84,6 +90,7 @@ internal class Program
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<ILessonService, LessonService>();
+        builder.Services.AddScoped<ILessonWordService, LessonWordService>();
 
         var app = builder.Build();
 

@@ -1,10 +1,10 @@
-﻿using Application.Services.Interfaces.IRepository;
+﻿using Application.Services.Interfaces.IRepository.Profile;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Persistance.Repositories
+namespace Persistance.Repository.Userfsf
 {
     public class UserRepository : IUserRepository
     {
@@ -22,13 +22,13 @@ namespace Persistance.Repositories
             try
             {
                 _logger.LogInformation($"Fetching user by ID: {id}");
-               
+
                 var user = await _userManager.FindByIdAsync(id);
-                
+
                 if (user == null)
                 {
                     _logger.LogWarning($"User with ID {id} not found.");
-                    
+
                     return null;
                 }
 
@@ -46,7 +46,7 @@ namespace Persistance.Repositories
             try
             {
                 _logger.LogInformation("Fetching all users.");
-                
+
                 return await _userManager.Users.ToListAsync();
             }
             catch (Exception ex)
@@ -61,16 +61,16 @@ namespace Persistance.Repositories
             try
             {
                 _logger.LogInformation($"Updating user with ID: {user.Id}");
-               
+
                 if (user == null)
                 {
                     _logger.LogWarning("User object is null.");
-                    
+
                     return IdentityResult.Failed(new IdentityError { Description = "User object is null." });
                 }
 
                 var result = await _userManager.UpdateAsync(user);
-                
+
                 if (!result.Succeeded)
                 {
                     _logger.LogWarning($"Failed to update user with ID {user.Id}: {string.Join(", ", result.Errors.Select(e => e.Description))}");
@@ -95,16 +95,16 @@ namespace Persistance.Repositories
                 _logger.LogInformation($"Deleting user with ID: {id}");
 
                 var user = await _userManager.FindByIdAsync(id);
-                
+
                 if (user == null)
                 {
                     _logger.LogWarning($"User with ID {id} not found.");
-                    
+
                     return IdentityResult.Failed(new IdentityError { Description = "User not found." });
                 }
 
                 var result = await _userManager.DeleteAsync(user);
-                
+
                 if (!result.Succeeded)
                 {
                     _logger.LogWarning($"Failed to delete user with ID {id}: {string.Join(", ", result.Errors.Select(e => e.Description))}");

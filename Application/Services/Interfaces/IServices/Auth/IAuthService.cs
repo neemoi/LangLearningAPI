@@ -2,12 +2,12 @@
 using Application.DtoModels.Auth.Response;
 using Microsoft.AspNetCore.Identity;
 
-namespace Application.Services.Interfaces.IServices
+namespace Application.Services.Interfaces.IServices.Auth
 {
     public interface IAuthService
     {
         Task<AuthRegisterResponseDto> RegisterUserAsync(AuthRegisterDto registerDto);
-        
+
         Task<AuthLoginResponseDto> LoginAsync(AuthLoginDto loginDto);
 
         Task<UserStatusResponseDto> BlockUserAsync(string userId);
@@ -17,7 +17,7 @@ namespace Application.Services.Interfaces.IServices
         Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto);
 
         Task<string> GeneratePasswordResetTokenAsync(ForgotPasswordDto forgotPasswordDto);
-        
+
         Task LogoutAsync();
     }
 }

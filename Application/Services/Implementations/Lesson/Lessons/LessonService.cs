@@ -1,11 +1,11 @@
 ﻿using Application.DtoModels.Lessons.Lessons;
 using Application.DtoModels.Lessons.Quiz;
-using Application.Services.Interfaces.IServices;
+using Application.Services.Interfaces.IServices.Lesons;
 using Application.UnitOfWork;
 using AutoMapper;
 using Microsoft.Extensions.Logging;
 
-namespace Application.Services.Implementations.Lesson
+namespace Application.Services.Implementations.Lesson.Lessons
 {
     public class LessonService : ILessonService
     {
@@ -54,7 +54,7 @@ namespace Application.Services.Implementations.Lesson
             try
             {
                 var lessons = await _unitOfWork.LessonRepository.GetAllLessonsAsync();
-                
+
                 return _mapper.Map<List<LessonDto>>(lessons);
             }
             catch (KeyNotFoundException ex)
@@ -183,8 +183,8 @@ namespace Application.Services.Implementations.Lesson
                     throw new ArgumentException("Lesson ID must be a positive integer", nameof(lessonId));
                 }
 
-                var words = await _unitOfWork.LessonRepository.GetWordsByLessonAsync(lessonId);
-                
+                var words = await _unitOfWork.LessonRepository.GetWordsByLessonIdAsync(lessonId);
+
                 return _mapper.Map<List<LessonWordDto>>(words);
             }
             catch (KeyNotFoundException ex)
@@ -211,7 +211,7 @@ namespace Application.Services.Implementations.Lesson
                 }
 
                 var phrases = await _unitOfWork.LessonRepository.GetPhrasesByLessonAsync(lessonId);
-                
+
                 return _mapper.Map<List<LessonPhraseDto>>(phrases);
             }
             catch (KeyNotFoundException ex)
@@ -238,7 +238,7 @@ namespace Application.Services.Implementations.Lesson
                 }
 
                 var quizzes = await _unitOfWork.LessonRepository.GetQuizzesByLessonAsync(lessonId);
-                
+
                 return _mapper.Map<List<QuizDto>>(quizzes);
             }
             catch (KeyNotFoundException ex)

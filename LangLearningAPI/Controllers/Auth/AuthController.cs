@@ -1,5 +1,5 @@
 ﻿using Application.DtoModels.Auth;
-using Application.Services.Interfaces.IServices;
+using Application.Services.Interfaces.IServices.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

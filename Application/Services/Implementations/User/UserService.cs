@@ -1,6 +1,6 @@
 ﻿using Application.DtoModels.AdminUsers;
 using Application.DtoModels.User;
-using Application.Services.Interfaces.IServices;
+using Application.Services.Interfaces.IServices.Profile;
 using Application.UnitOfWork;
 using AutoMapper;
 using Domain.Models;

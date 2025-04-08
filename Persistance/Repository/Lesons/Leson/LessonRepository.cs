@@ -1,11 +1,11 @@
-﻿using Application.Services.Interfaces.IRepository;
+﻿using Application.Services.Interfaces.IRepository.Lesons;
 using AutoMapper;
 using Domain.Models;
 using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
-namespace Persistance.Repository
+namespace Persistance.Repository.Lesons.Leson
 {
     public class LessonRepository : ILessonRepository
     {
@@ -110,7 +110,7 @@ namespace Persistance.Repository
                     _logger.LogWarning("Attempt to add null lesson");
                     throw new ArgumentNullException(nameof(lesson), "Lesson cannot be null");
                 }
-                
+
                 await _context.Lessons.AddAsync(lesson);
                 await _context.SaveChangesAsync();
 
@@ -198,7 +198,7 @@ namespace Persistance.Repository
             }
         }
 
-        public async Task<List<LessonWord>> GetWordsByLessonAsync(int lessonId)
+        public async Task<List<LessonWord>> GetWordsByLessonIdAsync(int lessonId)
         {
 
             try

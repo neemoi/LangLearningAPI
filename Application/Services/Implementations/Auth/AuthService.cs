@@ -1,12 +1,12 @@
 ﻿using Application.DtoModels.Auth;
 using Application.DtoModels.Auth.Response;
-using Application.Services.Interfaces.IServices;
 using AutoMapper;
 using Domain.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Application.UnitOfWork;
+using Application.Services.Interfaces.IServices.Auth;
 
 namespace Application.Services.Implementations.Auth
 {

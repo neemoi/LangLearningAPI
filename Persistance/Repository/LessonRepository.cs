@@ -32,12 +32,22 @@ namespace Persistance.Repository
                 }
 
                 var lesson = await _context.Lessons
-                    .Include(l => l.Words)
-                    .Include(l => l.Phrases)
-                    .Include(l => l.Quizzes)
-                        .ThenInclude(q => q.Questions)
-                            .ThenInclude(q => q.Answers)
-                    .FirstOrDefaultAsync(l => l.Id == id);
+                  .Include(l => l.Words)
+                  .Include(l => l.Phrases)
+                  .Include(l => l.Quizzes)
+                  .FirstOrDefaultAsync(l => l.Id == id);
+
+                if (lesson != null)
+                {
+                    foreach (var quiz in lesson.Quizzes)
+                    {
+                        await _context.Entry(quiz)
+                            .Collection(q => q.Questions)
+                            .Query()
+                            .Include(q => q.Answers)
+                            .LoadAsync();
+                    }
+                }
 
                 if (lesson == null)
                 {
@@ -64,7 +74,19 @@ namespace Persistance.Repository
                     .Include(l => l.Quizzes)
                     .ToListAsync();
 
-                if (lessons == null || !lessons.Any())
+                foreach (var lesson in lessons)
+                {
+                    foreach (var quiz in lesson.Quizzes)
+                    {
+                        await _context.Entry(quiz)
+                            .Collection(q => q.Questions)
+                            .Query()
+                            .Include(q => q.Answers)
+                            .LoadAsync();
+                    }
+                }
+
+                if (!lessons.Any())
                 {
                     _logger.LogWarning("No lessons found in database");
                     throw new KeyNotFoundException("No lessons exist in the database");

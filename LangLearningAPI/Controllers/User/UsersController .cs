@@ -2,7 +2,6 @@
 using Application.DtoModels.User;
 using Application.Services.Interfaces.IServices;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 [ApiController]
 [Route("api/[controller]")]

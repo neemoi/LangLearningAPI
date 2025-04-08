@@ -6,8 +6,6 @@
 
         public string? AnswerText { get; set; }
 
-        public string? ImageUrl { get; set; }
-
         public bool IsCorrect { get; set; }
     }
 }

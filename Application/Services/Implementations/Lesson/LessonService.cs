@@ -32,7 +32,9 @@ namespace Application.Services.Implementations.Lesson
                 }
 
                 var lesson = await _unitOfWork.LessonRepository.GetLessonByIdAsync(id);
-                
+
+                _logger.LogInformation("Retrieved lesson with {QuizCount} quizzes", lesson.Quizzes.Count);
+
                 return _mapper.Map<LessonDto>(lesson);
             }
             catch (KeyNotFoundException ex)

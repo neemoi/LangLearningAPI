@@ -1,5 +1,4 @@
-﻿using Application.DtoModels.Lessons;
-using Application.DtoModels.Lessons.Lessons;
+﻿using Application.DtoModels.Lessons.Lessons;
 using Application.DtoModels.Lessons.Quiz;
 using AutoMapper;
 using Domain.Models;

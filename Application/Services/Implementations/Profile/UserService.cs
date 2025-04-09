@@ -1,37 +1,44 @@
-﻿using Application.Services.Interfaces.IRepository.Profile;
+﻿using Application.DtoModels.AdminUsers;
+using Application.DtoModels.User;
+using Application.Services.Interfaces.IServices.Profile;
+using Application.UnitOfWork;
+using AutoMapper;
 using Domain.Models;
 using LangLearningAPI.Exceptions;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.Net;
 
-namespace Persistance.Repository.Userfsf
+namespace Application.Services.Implementations
 {
-    public class UserRepository : IUserRepository
+    public class UserService : IUserService
     {
+        private readonly IUnitOfWork _unitOfWork;
+        private readonly IMapper _mapper;
+        private readonly ILogger<UserService> _logger;
         private readonly UserManager<Users> _userManager;
-        private readonly ILogger<UserRepository> _logger;
 
-        public UserRepository(UserManager<Users> userManager, ILogger<UserRepository> logger)
+        public UserService(IUnitOfWork unitOfWork, IMapper mapper,
+            ILogger<UserService> logger, UserManager<Users> userManager)
         {
-            _userManager = userManager;
+            _unitOfWork = unitOfWork;
+            _mapper = mapper;
             _logger = logger;
+            _userManager = userManager;
         }
 
-        public async Task<Users> GetUserByIdAsync(string id)
+        public async Task<UserByIdDto> GetUserByIdAsync(string id)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(id))
                 {
-                    _logger.LogWarning("Attempted to get user with empty ID");
                     throw new ArgumentException("User ID cannot be empty", nameof(id));
                 }
 
                 _logger.LogInformation("Fetching user by ID: {UserId}", id);
 
-                var user = await _userManager.FindByIdAsync(id);
+                var user = await _unitOfWork.UserRepository.GetUserByIdAsync(id);
 
                 if (user == null)
                 {
@@ -39,7 +46,7 @@ namespace Persistance.Repository.Userfsf
                     throw new NotFoundException($"User with ID {id} not found", "USER_NOT_FOUND");
                 }
 
-                return user;
+                return _mapper.Map<UserByIdDto>(user);
             }
             catch (Exception ex) when (ex is not ApiException)
             {
@@ -52,21 +59,24 @@ namespace Persistance.Repository.Userfsf
             }
         }
 
-        public async Task<IEnumerable<Users>> GetAllUsersAsync()
+        public async Task<IEnumerable<UserDto>> GetAllUsersAsync()
         {
             try
             {
                 _logger.LogInformation("Fetching all users");
 
-                var users = await _userManager.Users.ToListAsync();
+                var users = await _unitOfWork.UserRepository.GetAllUsersAsync();
+                var userDtos = new List<UserDto>();
 
-                if (users == null || !users.Any())
+                foreach (var user in users)
                 {
-                    _logger.LogWarning("No users found in database");
-                    return Enumerable.Empty<Users>();
+                    var userDto = _mapper.Map<UserDto>(user);
+                    var roles = await _userManager.GetRolesAsync(user);
+                    userDto.Role = roles.FirstOrDefault();
+                    userDtos.Add(userDto);
                 }
 
-                return users;
+                return userDtos;
             }
             catch (Exception ex) when (ex is not ApiException)
             {
@@ -79,34 +89,47 @@ namespace Persistance.Repository.Userfsf
             }
         }
 
-        public async Task<IdentityResult> UpdateUserAsync(Users user)
+        public async Task<UserResponseDto> UpdateUserAsync(string id, UpdateUserDto updateUserDto)
         {
             try
             {
-                if (user == null)
+                if (string.IsNullOrWhiteSpace(id))
                 {
-                    _logger.LogWarning("Attempted to update null user");
-                    throw new ArgumentNullException(nameof(user), "User cannot be null");
+                    throw new ArgumentException("User ID cannot be empty", nameof(id));
                 }
 
-                _logger.LogInformation("Updating user with ID: {UserId}", user.Id);
+                _logger.LogInformation("Updating user with ID: {UserId}", id);
 
-                var result = await _userManager.UpdateAsync(user);
+                var user = await _unitOfWork.UserRepository.GetUserByIdAsync(id);
+
+                if (user == null)
+                {
+                    _logger.LogWarning("User with ID {UserId} not found", id);
+                    throw new NotFoundException($"User with ID {id} not found", "USER_NOT_FOUND");
+                }
+
+                _mapper.Map(updateUserDto, user);
+
+                var result = await _unitOfWork.UserRepository.UpdateUserAsync(user);
 
                 if (!result.Succeeded)
                 {
                     var errors = string.Join(", ", result.Errors.Select(e => e.Description));
-                    _logger.LogWarning("Failed to update user {UserId}. Errors: {Errors}", user.Id, errors);
+                    _logger.LogWarning("Failed to update user {UserId}. Errors: {Errors}", id, errors);
                     throw new IdentityException("User update failed", "USER_UPDATE_FAILED", result.Errors.ToString());
                 }
 
-                _logger.LogInformation("User {UserId} updated successfully", user.Id);
+                var userDto = _mapper.Map<UserResponseDto>(user);
+                var roles = await _userManager.GetRolesAsync(user);
+                userDto.Role = roles.FirstOrDefault();
+
+                _logger.LogInformation("User {UserId} updated successfully", id);
                 
-                return result;
+                return userDto;
             }
             catch (Exception ex) when (ex is not ApiException)
             {
-                _logger.LogError(ex, "Error updating user with ID: {UserId}", user?.Id);
+                _logger.LogError(ex, "Error updating user with ID: {UserId}", id);
                 throw new ApiException(
                     (int)HttpStatusCode.InternalServerError,
                     "Failed to update user",
@@ -115,22 +138,43 @@ namespace Persistance.Repository.Userfsf
             }
         }
 
-        public async Task<IdentityResult> DeleteUserAsync(string id)
+        public async Task<UserResponseDto> DeleteUserAsync(string id, string currentUserId)
         {
             try
             {
                 if (string.IsNullOrWhiteSpace(id))
                 {
-                    _logger.LogWarning("Attempted to delete user with empty ID");
                     throw new ArgumentException("User ID cannot be empty", nameof(id));
+                }
+
+                if (string.IsNullOrWhiteSpace(currentUserId))
+                {
+                    throw new ArgumentException("Current user ID cannot be empty", nameof(currentUserId));
                 }
 
                 _logger.LogInformation("Deleting user with ID: {UserId}", id);
 
+                var currentUser = await _userManager.FindByIdAsync(currentUserId);
+
+                if (currentUser == null)
+                {
+                    _logger.LogWarning("Current user with ID {CurrentUserId} not found", currentUserId);
+                    throw new NotFoundException("Current user not found", "CURRENT_USER_NOT_FOUND");
+                }
+
+                var isAdmin = await _userManager.IsInRoleAsync(currentUser, "Admin");
+
+                if (!isAdmin)
+                {
+                    _logger.LogWarning("User with ID {CurrentUserId} is not an admin", currentUserId);
+                    throw new ForbiddenException("Only admins can delete users", "ADMIN_REQUIRED");
+                }
+
                 var user = await _userManager.FindByIdAsync(id);
+
                 if (user == null)
                 {
-                    _logger.LogWarning("User with ID {UserId} not found for deletion", id);
+                    _logger.LogWarning("User with ID {UserId} not found", id);
                     throw new NotFoundException($"User with ID {id} not found", "USER_NOT_FOUND");
                 }
 
@@ -143,9 +187,13 @@ namespace Persistance.Repository.Userfsf
                     throw new IdentityException("User deletion failed", "USER_DELETION_FAILED", result.Errors.ToString());
                 }
 
+                var userDto = _mapper.Map<UserResponseDto>(user);
+                var roles = await _userManager.GetRolesAsync(user);
+                userDto.Role = roles.FirstOrDefault();
+
                 _logger.LogInformation("User {UserId} deleted successfully", id);
                 
-                return result;
+                return userDto;
             }
             catch (Exception ex) when (ex is not ApiException)
             {

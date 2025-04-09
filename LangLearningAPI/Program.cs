@@ -18,6 +18,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using Persistance.Repository.Auth;
 using Persistance.Repository.Lesons.Leson;
 using Persistance.Repository.Lesons.Words;
 using Persistance.Repository.Userfsf;

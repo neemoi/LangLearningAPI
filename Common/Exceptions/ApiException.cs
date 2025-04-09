@@ -1,7 +1,4 @@
-﻿using System;
-using System.Net;
-
-namespace LangLearningAPI.Exceptions
+﻿namespace LangLearningAPI.Exceptions
 {
     public class ApiException : Exception
     {

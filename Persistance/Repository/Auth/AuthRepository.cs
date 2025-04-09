@@ -2,255 +2,350 @@
 using Application.Services.Interfaces.IRepository.Auth;
 using AutoMapper;
 using Domain.Models;
+using LangLearningAPI.Exceptions;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 using System.ComponentModel.DataAnnotations;
+using System.Net;
 
-public class AuthRepository : IAuthRepository
+namespace Persistance.Repository.Auth
 {
-    private readonly UserManager<Users> _userManager;
-    private readonly SignInManager<Users> _signInManager;
-    private readonly ILogger<AuthRepository> _logger;
-    private readonly IMapper _mapper;
-
-    public AuthRepository(UserManager<Users> userManager, ILogger<AuthRepository> logger, IMapper mapper, SignInManager<Users> signInManager)
+    public class AuthRepository : IAuthRepository
     {
-        _userManager = userManager;
-        _logger = logger;
-        _mapper = mapper;
-        _signInManager = signInManager;
-    }
+        private readonly UserManager<Users> _userManager;
+        private readonly SignInManager<Users> _signInManager;
+        private readonly ILogger<AuthRepository> _logger;
+        private readonly IMapper _mapper;
 
-    public async Task<Users> RegisterUserAsync(AuthRegisterDto registerDto)
-    {
-        if (registerDto == null)
+        public AuthRepository(UserManager<Users> userManager, SignInManager<Users> signInManager,
+            ILogger<AuthRepository> logger, IMapper mapper)
         {
-            throw new ArgumentNullException(nameof(registerDto), "RegisterDto cannot be null");
+            _userManager = userManager;
+            _signInManager = signInManager;
+            _logger = logger;
+            _mapper = mapper;
         }
 
-        var validationContext = new ValidationContext(registerDto);
-        var validationResults = new List<ValidationResult>();
-        bool isValid = Validator.TryValidateObject(registerDto, validationContext, validationResults, true);
-
-        if (!isValid)
+        public async Task<Users> RegisterUserAsync(AuthRegisterDto registerDto)
         {
-            var errors = validationResults.Select(vr => vr.ErrorMessage).ToList();
-            throw new ValidationException(string.Join(", ", errors));
-        }
-
-        try
-        {
-            _logger.LogInformation("Admin is attempting to register a new user: {Email}", registerDto.Email);
-
-            var user = _mapper.Map<Users>(registerDto);
-
-            if (await _userManager.FindByEmailAsync(registerDto.Email) != null)
+            try
             {
-                throw new Exception($"User with email {registerDto.Email} already exists");
+                ValidateAuthDto(registerDto);
+
+                await ValidateUserNotExists(registerDto.Email);
+
+                _logger.LogInformation("Registering new user: {Email}", registerDto.Email);
+
+                var user = _mapper.Map<Users>(registerDto);
+                var result = await _userManager.CreateAsync(user, registerDto.Password);
+
+                if (!result.Succeeded)
+                {
+                    foreach (var error in result.Errors)
+                    {
+                        _logger.LogError("Registration failed: {Error}", error.Description);
+                    }
+                    throw new IdentityException(
+                        "User creation failed",
+                        "USER_CREATION_FAILED",
+                        result.Errors.Select(e => e.Description).ToArray());
+                }
+
+                await _userManager.AddToRoleAsync(user, "User");
+
+                _logger.LogInformation("User {Email} registered successfully", registerDto.Email);
+
+                return user;
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError(ex, "Error registering user {Email}", registerDto.Email);
+                throw new ApiException(
+                    (int)HttpStatusCode.InternalServerError,
+                    "User registration failed",
+                    "USER_REGISTRATION_FAILED",
+                    ex);
+            }
+        }
+
+        public async Task<Users> LoginAsync(AuthLoginDto loginDto)
+        {
+            try
+            {
+                ValidateAuthDto(loginDto);
+
+                _logger.LogInformation("Login attempt for: {EmailOrUsername}", loginDto.EmailOrUserName);
+
+                var user = await FindUserByEmailOrUsername(loginDto.EmailOrUserName)
+                    ?? throw new NotFoundException("User not found", "USER_NOT_FOUND");
+
+                await ValidateUserCredentials(user, loginDto.Password);
+                CheckUserBlockedStatus(user);
+
+                _logger.LogInformation("User {EmailOrUsername} logged in successfully", loginDto.EmailOrUserName);
+                
+                return user;
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError(ex, "Login failed for: {EmailOrUsername}", loginDto.EmailOrUserName);
+                throw new ApiException(
+                    (int)HttpStatusCode.Unauthorized,
+                    "Login failed",
+                    "LOGIN_FAILED",
+                    ex);
+            }
+        }
+
+        public async Task<Users> BlockUserAsync(string userId)
+        {
+            try
+            {
+                ValidateUserId(userId);
+                _logger.LogInformation("Blocking user: {UserId}", userId);
+
+                var user = await GetUserById(userId);
+                user.LockoutEnd = DateTimeOffset.MaxValue;
+                user.LockoutEnabled = true; 
+
+                var result = await _userManager.UpdateAsync(user);
+                if (!result.Succeeded)
+                {
+                    throw new IdentityException(
+                        "Failed to update user lockout",
+                        "LOCKOUT_UPDATE_FAILED",
+                        result.Errors.Select(e => e.Description).ToArray());
+                }
+
+                _logger.LogInformation("User {UserId} blocked successfully", userId);
+                return user;
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError(ex, "Error blocking user: {UserId}", userId);
+                throw new ApiException(
+                    (int)HttpStatusCode.InternalServerError,
+                    "Failed to block user",
+                    "BLOCK_USER_FAILED",
+                    ex);
+            }
+        }
+
+        public async Task<Users> UnblockUserAsync(string userId)
+        {
+            try
+            {
+                ValidateUserId(userId);
+
+                _logger.LogInformation("Unblocking user: {UserId}", userId);
+
+                var user = await GetUserById(userId);
+                user.LockoutEnd = null;
+
+                await _userManager.UpdateAsync(user);
+
+                _logger.LogInformation("User {UserId} unblocked successfully", userId);
+                
+                return user;
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError(ex, "Error unblocking user: {UserId}", userId);
+                throw new ApiException(
+                    (int)HttpStatusCode.InternalServerError,
+                    "Failed to unblock user",
+                    "UNBLOCK_USER_FAILED",
+                    ex);
+            }
+        }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(string email)
+        {
+            try
+            {
+                ValidateEmail(email);
+
+                _logger.LogInformation("Generating password reset token for: {Email}", email);
+
+                var user = await GetUserByEmail(email);
+                var token = await _userManager.GeneratePasswordResetTokenAsync(user);
+
+                _logger.LogInformation("Password reset token generated for: {Email}", email);
+                
+                return token;
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError(ex, "Error generating password reset token for: {Email}", email);
+                throw new ApiException(
+                    (int)HttpStatusCode.InternalServerError,
+                    "Failed to generate password reset token",
+                    "PASSWORD_RESET_TOKEN_FAILED",
+                    ex);
+            }
+        }
+
+        public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
+        {
+            try
+            {
+                ValidateAuthDto(resetPasswordDto);
+
+                _logger.LogInformation("Resetting password for: {Email}", resetPasswordDto.Email);
+
+                var user = await GetUserByEmail(resetPasswordDto.Email);
+                var result = await _userManager.ResetPasswordAsync(
+                    user,
+                    resetPasswordDto.Token,
+                    resetPasswordDto.NewPassword);
+
+                if (!result.Succeeded)
+                {
+                    throw new IdentityException(
+                        "Password reset failed",
+                        "PASSWORD_RESET_FAILED",
+                        result.Errors.Select(e => e.Description).ToArray());
+                }
+
+                _logger.LogInformation("Password reset successfully for: {Email}", resetPasswordDto.Email);
+                
+                return result;
+            }
+            catch (Exception ex) when (ex is not ApiException)
+            {
+                _logger.LogError(ex, "Error resetting password for: {Email}", resetPasswordDto.Email);
+                throw new ApiException(
+                    (int)HttpStatusCode.InternalServerError,
+                    "Password reset failed",
+                    "PASSWORD_RESET_FAILED",
+                    ex);
+            }
+        }
+
+        public async Task LogoutAsync()
+        {
+            try
+            {
+                _logger.LogInformation("Logging out current user");
+                
+                await _signInManager.SignOutAsync();
+                
+                _logger.LogInformation("User logged out successfully");
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error during logout");
+                throw new ApiException(
+                    (int)HttpStatusCode.InternalServerError,
+                    "Logout failed",
+                    "LOGOUT_FAILED",
+                    ex);
+            }
+        }
+
+        #region Private Helpers
+
+        private async Task<Users> GetUserById(string userId)
+        {
+            return await _userManager.FindByIdAsync(userId)
+                ?? throw new NotFoundException($"User with ID {userId} not found", "USER_NOT_FOUND");
+        }
+
+        private async Task<Users> GetUserByEmail(string email)
+        {
+            return await _userManager.FindByEmailAsync(email)
+                ?? throw new NotFoundException($"User with email {email} not found", "USER_NOT_FOUND");
+        }
+
+        private async Task<Users> FindUserByEmailOrUsername(string emailOrUsername)
+        {
+            var user = await _userManager.FindByEmailAsync(emailOrUsername);
+            return user ?? await _userManager.FindByNameAsync(emailOrUsername);
+        }
+
+        private async Task ValidateUserCredentials(Users user, string password)
+        {
+            if (!await _userManager.CheckPasswordAsync(user, password))
+            {
+                throw new UnauthorizedException("Invalid credentials", "INVALID_CREDENTIALS");
+            }
+        }
+
+        private void CheckUserBlockedStatus(Users user)
+        {
+            if (user.LockoutEnd != null && user.LockoutEnd > DateTimeOffset.UtcNow)
+            {
+                throw new ForbiddenException("User is blocked", "USER_BLOCKED");
+            }
+        }
+
+        private async Task ValidateUserNotExists(string email)
+        {
+            if (await _userManager.FindByEmailAsync(email) != null)
+            {
+                throw new ConflictException($"User with email {email} already exists", "USER_ALREADY_EXISTS");
+            }
+        }
+
+        #endregion
+
+        #region Validation Methods
+
+        private void ValidateAuthDto(object dto)
+        {
+            if (dto == null)
+            {
+                throw new LangLearningAPI.Exceptions.ValidationException(
+                    "Request data cannot be null",
+                    "NULL_REQUEST");
             }
 
-            var result = await _userManager.CreateAsync(user, registerDto.Password);
-            if (!result.Succeeded)
+            var validationResults = new List<ValidationResult>();
+            var context = new ValidationContext(dto);
+
+            if (!Validator.TryValidateObject(dto, context, validationResults, true))
             {
-                throw new Exception(string.Join(", ", result.Errors.Select(e => e.Description)));
+                var errors = validationResults
+                    .GroupBy(v => v.MemberNames.FirstOrDefault() ?? "")
+                    .ToDictionary(
+                        g => g.Key,
+                        g => g.Select(v => v.ErrorMessage ?? "").ToArray());
+
+                throw new LangLearningAPI.Exceptions.ValidationException(
+                    "Validation failed",
+                    "VALIDATION_ERROR",
+                    errors);
+            }
+        }
+
+
+        private void ValidateUserId(string userId)
+        {
+            if (string.IsNullOrWhiteSpace(userId))
+            {
+                throw new LangLearningAPI.Exceptions.ValidationException(
+                    "User ID cannot be empty",
+                    "EMPTY_USER_ID");
+            }
+        }
+
+        private void ValidateEmail(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                throw new LangLearningAPI.Exceptions.ValidationException(
+                    "Email cannot be empty",
+                    "EMPTY_EMAIL");
             }
 
-            await _userManager.AddToRoleAsync(user, "User");
-
-            _logger.LogInformation("User {Email} successfully registered", registerDto.Email);
-            return user;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error registering user: {Email}", registerDto.Email);
-            throw;
-        }
-    }
-
-    public async Task<Users> LoginAsync(AuthLoginDto loginDto)
-    {
-        if (loginDto == null)
-        {
-            throw new ArgumentNullException(nameof(loginDto), "LoginDto cannot be null");
-        }
-
-        var validationContext = new ValidationContext(loginDto);
-        var validationResults = new List<ValidationResult>();
-        bool isValid = Validator.TryValidateObject(loginDto, validationContext, validationResults, true);
-
-        if (!isValid)
-        {
-            var errors = validationResults.Select(vr => vr.ErrorMessage).ToList();
-            throw new ValidationException(string.Join(", ", errors));
-        }
-
-        try
-        {
-            _logger.LogInformation("User attempting to log in: {EmailOrUsername}", loginDto.EmailOrUserName);
-
-            var user = await _userManager.FindByEmailAsync(loginDto.EmailOrUserName);
-
-            if (user == null)
+            if (!new EmailAddressAttribute().IsValid(email))
             {
-                user = await _userManager.FindByNameAsync(loginDto.EmailOrUserName);
+                throw new LangLearningAPI.Exceptions.ValidationException(
+                    "Invalid email format",
+                    "INVALID_EMAIL");
             }
-
-            if (user == null)
-            {
-                throw new Exception("Invalid email/username or password");
-            }
-
-            if (!await _userManager.CheckPasswordAsync(user, loginDto.Password))
-            {
-                throw new Exception("Invalid email/username or password");
-            }
-
-            if (user.LockoutEnd != null && user.LockoutEnd > DateTime.UtcNow)
-            {
-                throw new Exception("User is blocked");
-            }
-
-            _logger.LogInformation("User {EmailOrUsername} successfully logged in", loginDto.EmailOrUserName);
-            return user;
         }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Login failed for: {EmailOrUsername}", loginDto.EmailOrUserName);
-            throw;
-        }
-    }
-
-    public async Task<Users> BlockUserAsync(string userId)
-    {
-        if (string.IsNullOrEmpty(userId))
-        {
-            throw new ArgumentNullException(nameof(userId), "UserId cannot be null or empty");
-        }
-
-        try
-        {
-            _logger.LogInformation("Attempting to block user: {UserId}", userId);
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                throw new Exception("User not found");
-            }
-
-            user.LockoutEnd = DateTimeOffset.MaxValue;
-            await _userManager.UpdateAsync(user);
-
-            _logger.LogInformation("User {UserId} has been blocked", userId);
-            return user;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error blocking user: {UserId}", userId);
-            throw;
-        }
-    }
-
-    public async Task<Users> UnblockUserAsync(string userId)
-    {
-        if (string.IsNullOrEmpty(userId))
-        {
-            throw new ArgumentNullException(nameof(userId), "UserId cannot be null or empty");
-        }
-
-        try
-        {
-            _logger.LogInformation("Attempting to unblock user: {UserId}", userId);
-
-            var user = await _userManager.FindByIdAsync(userId);
-            if (user == null)
-            {
-                throw new Exception("User not found");
-            }
-
-            user.LockoutEnd = null;
-            await _userManager.UpdateAsync(user);
-
-            _logger.LogInformation("User {UserId} has been unblocked", userId);
-            return user;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error unblocking user: {UserId}", userId);
-            throw;
-        }
-    }
-
-    public async Task<string> GeneratePasswordResetTokenAsync(string email)
-    {
-        if (string.IsNullOrEmpty(email))
-        {
-            throw new ArgumentNullException(nameof(email), "Email cannot be null or empty");
-        }
-
-        try
-        {
-            _logger.LogInformation("Generating password reset token for email: {Email}", email);
-
-            var user = await _userManager.FindByEmailAsync(email)
-                       ?? throw new Exception($"User with email {email} not found");
-
-            var token = await _userManager.GeneratePasswordResetTokenAsync(user);
-
-            return token;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error generating password reset token for email: {Email}", email);
-            throw;
-        }
-    }
-
-    public async Task<IdentityResult> ResetPasswordAsync(ResetPasswordDto resetPasswordDto)
-    {
-        if (resetPasswordDto == null)
-        {
-            throw new ArgumentNullException(nameof(resetPasswordDto), "ResetPasswordDto cannot be null");
-        }
-
-        var validationContext = new ValidationContext(resetPasswordDto);
-        var validationResults = new List<ValidationResult>();
-        bool isValid = Validator.TryValidateObject(resetPasswordDto, validationContext, validationResults, true);
-
-        if (!isValid)
-        {
-            var errors = validationResults.Select(vr => vr.ErrorMessage).ToList();
-            throw new ValidationException(string.Join(", ", errors));
-        }
-
-        try
-        {
-            _logger.LogInformation("Attempting to reset password for email: {Email}", resetPasswordDto.Email);
-
-            var user = await _userManager.FindByEmailAsync(resetPasswordDto.Email)
-                       ?? throw new Exception($"User with email {resetPasswordDto.Email} not found");
-
-            var result = await _userManager.ResetPasswordAsync(user, resetPasswordDto.Token, resetPasswordDto.NewPassword);
-
-            return result;
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error resetting password for email: {Email}", resetPasswordDto.Email);
-            throw;
-        }
-    }
-
-    public async Task LogoutAsync()
-    {
-        try
-        {
-            _logger.LogInformation("Logging out user.");
-            await _signInManager.SignOutAsync();
-        }
-        catch (Exception ex)
-        {
-            _logger.LogError(ex, "Error occurred during logout");
-            throw;
-        }
+        
+        #endregion
     }
 }

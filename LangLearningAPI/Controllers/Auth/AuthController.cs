@@ -1,5 +1,7 @@
 ﻿using Application.DtoModels.Auth;
+using Application.DtoModels.Auth.Response;
 using Application.Services.Interfaces.IServices.Auth;
+using LangLearningAPI.Exceptions;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -10,123 +12,179 @@ namespace LangLearningAPI.Controllers.Auth
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
-        private readonly ILogger<AuthController> _logger;
 
-        public AuthController(IAuthService authService, ILogger<AuthController> logger)
+        public AuthController(IAuthService authService)
         {
             _authService = authService;
-            _logger = logger;
         }
 
         [HttpPost("register")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> RegisterUserAsync([FromBody] AuthRegisterDto model)
         {
             try
             {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
                 return Ok(await _authService.RegisterUserAsync(model));
             }
-            catch (Exception ex)
+            catch (ArgumentException)
             {
-                _logger.LogError(ex, "Error occurred during user registration: {Email}", model.Email);
-                return BadRequest(new { error = ex.Message });
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
         [AllowAnonymous]
         [HttpPost("login")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> LoginAsync([FromBody] AuthLoginDto model)
         {
             try
             {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
                 return Ok(await _authService.LoginAsync(model));
             }
-            catch (Exception ex)
+            catch (UnauthorizedAccessException)
             {
-                _logger.LogError(ex, "Error occurred during login: {Email}", model.EmailOrUserName);
-                return Unauthorized(new { error = ex.Message });
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-
-        [HttpPost("block-user/{userId}")]
+        [HttpPost("block/{userId}")]
+        [ProducesResponseType(typeof(UserStatusResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> BlockUserAsync(string userId)
         {
             try
             {
-                return Ok(await _authService.BlockUserAsync(userId));
+                var result = await _authService.BlockUserAsync(userId);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(CreateProblemDetails(
+                    StatusCodes.Status404NotFound,
+                    "Not Found",
+                    ex.Message));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while blocking user: {UserId}", userId);
-                return BadRequest(new { error = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    CreateProblemDetails(
+                        StatusCodes.Status500InternalServerError,
+                        "Server Error",
+                        "An unexpected error occurred while blocking user"));
             }
         }
 
-        [HttpPost("unblock-user/{userId}")]
-        public async Task<IActionResult> UnBlockUserAsync(string userId)
+        [HttpPost("unblock/{userId}")]
+        [ProducesResponseType(typeof(UserStatusResponseDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UnblockUserAsync(string userId)
         {
             try
             {
-                return Ok(await _authService.UnblockUserAsync(userId)); 
+                var result = await _authService.UnblockUserAsync(userId);
+                return Ok(result);
+            }
+            catch (NotFoundException ex)
+            {
+                return NotFound(CreateProblemDetails(
+                    StatusCodes.Status404NotFound,
+                    "Not Found",
+                    ex.Message));
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while unblocking user: {UserId}", userId);
-                return BadRequest(new { error = ex.Message });
+                return StatusCode(StatusCodes.Status500InternalServerError,
+                    CreateProblemDetails(
+                        StatusCodes.Status500InternalServerError,
+                        "Server Error",
+                        "An unexpected error occurred while unblocking user"));
             }
         }
 
+        private static ProblemDetails CreateProblemDetails(int status, string title, string detail)
+        {
+            return new ProblemDetails
+            {
+                Status = status,
+                Title = title,
+                Detail = detail
+            };
+        }
 
-        [HttpPost("forgot-password")]
         [AllowAnonymous]
+        [HttpPost("forgot-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordDto forgotPasswordDto)
         {
             try
             {
-                var token = await _authService.GeneratePasswordResetTokenAsync(forgotPasswordDto);
-                return Ok(new { Token = token });
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
+                return Ok(await _authService.GeneratePasswordResetTokenAsync(forgotPasswordDto));
             }
-            catch (Exception ex)
+            catch (KeyNotFoundException)
             {
-                _logger.LogError(ex, "Error generating password reset token for email: {Email}", forgotPasswordDto.Email);
-                return HandleException(ex);
+                throw;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
 
-        [HttpPost("reset-password")]
         [AllowAnonymous]
+        [HttpPost("reset-password")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDto resetPasswordDto)
         {
             try
             {
+                if (!ModelState.IsValid)
+                    return BadRequest(ModelState);
+
                 return Ok(await _authService.ResetPasswordAsync(resetPasswordDto));
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error occurred during password reset for email: {Email}", resetPasswordDto.Email);
-                return HandleException(ex);
+                throw;
             }
         }
 
         [HttpPost("logout")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> Logout()
         {
             try
             {
                 await _authService.LogoutAsync();
-                return Ok("Logout successful");
+                return Ok();
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                _logger.LogError(ex, "Error occurred during logout");
-                return HandleException(ex);
+                throw;
             }
-        }
-
-        private IActionResult HandleException(Exception ex)
-        {
-            _logger.LogError(ex, "An error occurred in AuthController: {Message}", ex.Message);
-            return StatusCode(500, new { Message = "An internal server error occurred.", Details = ex.Message });
         }
     }
 }

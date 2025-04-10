@@ -4,9 +4,11 @@ using Application.Services.Implementations;
 using Application.Services.Implementations.Auth;
 using Application.Services.Implementations.Auth.JWT;
 using Application.Services.Implementations.Lesson.Lessons;
+using Application.Services.Implementations.Lesson.Phrasees;
 using Application.Services.Implementations.Lesson.Words;
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Lesons;
+using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Lesons;
@@ -21,6 +23,8 @@ using Microsoft.IdentityModel.Tokens;
 using Persistance.Repository.Auth;
 using Persistance.Repository.Lesons.Leson;
 using Persistance.Repository.Lesons.Words;
+using Persistance.Repository.Lessons;
+using Persistance.Repository.Lessons.Lesson;
 using Persistance.Repository.Userfsf;
 using Persistance.UnitOfWork;
 using System.Text;
@@ -78,12 +82,14 @@ internal class Program
         builder.Services.AddSwaggerGen();
         builder.Services.AddLogging();
 
-        builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile), typeof(MappingLessonWordProfile));
+        builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile), typeof(MappingLessonWordProfile), 
+            typeof(MappingLessonPhraseProfile));
 
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
         builder.Services.AddScoped<ILessonRepository, LessonRepository>();
         builder.Services.AddScoped<ILessonWordRepository, LessonWordRepository>();
+        builder.Services.AddScoped<ILessonPhraseRepository, LessonPhraseRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -91,6 +97,7 @@ internal class Program
         builder.Services.AddScoped<IAuthService, AuthService>();
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<ILessonService, LessonService>();
+        builder.Services.AddScoped<ILessonPhraseService, LessonPhraseService>();
         builder.Services.AddScoped<ILessonWordService, LessonWordService>();
 
         var app = builder.Build();
@@ -106,6 +113,7 @@ internal class Program
 
         if (app.Environment.IsDevelopment())
         {
+            app.UseDeveloperExceptionPage();
             app.UseSwagger();
             app.UseSwaggerUI();
         }

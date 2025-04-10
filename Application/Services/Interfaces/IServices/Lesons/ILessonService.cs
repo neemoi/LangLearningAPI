@@ -1,4 +1,5 @@
 ﻿using Application.DtoModels.Lessons.Lessons;
+using Application.DtoModels.Lessons.Phrasees;
 using Application.DtoModels.Lessons.Quiz;
 
 namespace Application.Services.Interfaces.IServices.Lesons

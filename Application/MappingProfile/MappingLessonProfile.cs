@@ -1,4 +1,5 @@
 ﻿using Application.DtoModels.Lessons.Lessons;
+using Application.DtoModels.Lessons.Phrasees;
 using Application.DtoModels.Lessons.Quiz;
 using AutoMapper;
 using Domain.Models;
@@ -20,8 +21,7 @@ namespace Application.MappingProfile
             CreateMap<LessonWord, LessonWordDto>()
                 .ForMember(dest => dest.IsAdditional, opt => opt.MapFrom(src => src.Type == "additional"));
 
-            CreateMap<LessonPhrase, LessonPhraseDto>()
-                .ForMember(dest => dest.IsComplex, opt => opt.MapFrom(src => src.PhraseText.Length > 20));
+            CreateMap<LessonPhrase, LessonPhraseDto>();
 
             CreateMap<Quiz, QuizDto>()
                 .ForMember(dest => dest.QuizType, opt => opt.MapFrom(src => src.Type.ToUpper()))

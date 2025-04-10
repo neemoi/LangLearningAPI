@@ -1,5 +1,4 @@
-﻿using Application.DtoModels.Lessons.Words;
-using Domain.Models;
+﻿using Domain.Models;
 
 namespace Application.Services.Interfaces.IRepository.Lesons
 {

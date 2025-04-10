@@ -1,6 +1,7 @@
 ﻿using Application.Services.Implementations.Auth.JWT;
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Lesons;
+using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
 
@@ -17,6 +18,8 @@ namespace Application.UnitOfWork
         public ILessonRepository LessonRepository { get; }
 
         public ILessonWordRepository LessonWordRepository { get; }
+
+        public ILessonPhraseRepository LessonPhraseRepository { get; }
 
         public IJwtService JwtService{ get; }
 

@@ -1,6 +1,7 @@
 ﻿using Application.Services.Implementations.Auth.JWT;
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Lesons;
+using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
 using Application.UnitOfWork;
@@ -19,6 +20,9 @@ namespace Persistance.UnitOfWork
         public ILessonRepository LessonRepository { get; }
 
         public ILessonWordRepository LessonWordRepository { get; }
+
+        public ILessonPhraseRepository LessonPhraseRepository { get; }
+
         public IJwtService JwtService { get; }
 
 
@@ -26,7 +30,7 @@ namespace Persistance.UnitOfWork
 
         public UnitOfWork(LanguageLearningDbContext languageLearningDbContext, IAuthRepository authRepository, IAuthEmailService emailService,
             IJwtService jwtService, IAuthEmailService authEmailService, IUserRepository userRepository, ILessonRepository lessonRepository, 
-            ILessonWordRepository lessonWordRepository)
+            ILessonWordRepository lessonWordRepository, ILessonPhraseRepository lessonPhraseRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -35,6 +39,7 @@ namespace Persistance.UnitOfWork
             UserRepository = userRepository;
             LessonRepository = lessonRepository;
             LessonWordRepository = lessonWordRepository;
+            LessonPhraseRepository = lessonPhraseRepository;
         }
 
         public async Task SaveChangesAsync()

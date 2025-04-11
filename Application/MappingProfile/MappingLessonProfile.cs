@@ -1,6 +1,7 @@
 ﻿using Application.DtoModels.Lessons.Lessons;
 using Application.DtoModels.Lessons.Phrasees;
 using Application.DtoModels.Lessons.Quiz;
+using Application.DtoModels.Lessons.Words;
 using AutoMapper;
 using Domain.Models;
 
@@ -18,14 +19,31 @@ namespace Application.MappingProfile
             CreateMap<Lesson, LessonDetailDto>()
                 .IncludeBase<Lesson, LessonDto>();
 
-            CreateMap<LessonWord, LessonWordDto>()
+            CreateMap<CreateLessonDto, Lesson>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
+
+            CreateMap<UpdateLessonDto, Lesson>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+
+            CreateMap<LessonWord, DtoModels.Lessons.Lessons.LessonWordDto>()
                 .ForMember(dest => dest.IsAdditional, opt => opt.MapFrom(src => src.Type == "additional"));
 
+            CreateMap<CreateLessonWordDto, LessonWord>();
+            CreateMap<UpdateLessonWordDto, LessonWord>();
+
             CreateMap<LessonPhrase, LessonPhraseDto>();
+            CreateMap<CreateLessonPhraseDto, LessonPhrase>();
+            CreateMap<UpdateLessonPhraseDto, LessonPhrase>();
 
             CreateMap<Quiz, QuizDto>()
-                .ForMember(dest => dest.QuizType, opt => opt.MapFrom(src => src.Type.ToUpper()))
-                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToUpper()));
+
+            CreateMap<CreateQuizDto, Quiz>()
+                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToUpper()));
+
+            CreateMap<UpdateQuizDto, Quiz>()
+                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
 
             CreateMap<QuizQuestion, QuizQuestionDto>()
                 .ForMember(dest => dest.HasMedia,
@@ -33,13 +51,12 @@ namespace Application.MappingProfile
                                               !string.IsNullOrEmpty(src.AudioUrl)))
                 .ForMember(dest => dest.Answers, opt => opt.MapFrom(src => src.Answers));
 
+            CreateMap<CreateQuizDto, QuizQuestion>();
+            CreateMap<CreateQuizDto, QuizQuestion>();
+
             CreateMap<QuizAnswer, QuizAnswerDto>();
-
-            CreateMap<CreateLessonDto, Lesson>()
-                .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow));
-
-            CreateMap<UpdateLessonDto, Lesson>()
-                .ForAllMembers(opts => opts.Condition((src, dest, srcMember) => srcMember != null));
+            CreateMap<CreateQuizDto, QuizAnswer>();
+            CreateMap<CreateQuizDto, QuizAnswer>();
         }
     }
 }

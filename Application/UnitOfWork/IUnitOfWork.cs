@@ -21,6 +21,8 @@ namespace Application.UnitOfWork
 
         public ILessonPhraseRepository LessonPhraseRepository { get; }
 
+        public IQuizRepository QuizRepository { get; }
+
         public IJwtService JwtService{ get; }
 
         Task SaveChangesAsync();

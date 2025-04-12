@@ -1,6 +1,7 @@
 ﻿using Application.DtoModels.Lessons.Lessons;
 using Application.DtoModels.Lessons.Phrasees;
 using Application.DtoModels.Lessons.Quiz;
+using Application.DtoModels.Lessons.QuizQuestion;
 using Application.DtoModels.Lessons.Words;
 using AutoMapper;
 using Domain.Models;
@@ -36,7 +37,8 @@ namespace Application.MappingProfile
             CreateMap<UpdateLessonPhraseDto, LessonPhrase>();
 
             CreateMap<Quiz, QuizDto>()
-                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToUpper()));
+                .ForMember(dest => dest.Type, opt => opt.MapFrom(src => src.Type.ToUpper()))
+                .ForMember(dest => dest.Questions, opt => opt.MapFrom(src => src.Questions));
 
             CreateMap<CreateQuizDto, Quiz>()
                 .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(_ => DateTime.UtcNow))
@@ -57,6 +59,8 @@ namespace Application.MappingProfile
             CreateMap<QuizAnswer, QuizAnswerDto>();
             CreateMap<CreateQuizDto, QuizAnswer>();
             CreateMap<CreateQuizDto, QuizAnswer>();
+
+
         }
     }
 }

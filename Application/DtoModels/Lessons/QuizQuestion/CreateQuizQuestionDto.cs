@@ -1,8 +1,10 @@
-﻿namespace Application.DtoModels.Lessons.Quiz
+﻿using Application.DtoModels.Lessons.Quiz;
+
+namespace Application.DtoModels.Lessons.QuizQuestion
 {
-    public class QuizQuestionDto
+    public class CreateQuizQuestionDto
     {
-        public int Id { get; set; }
+        public int QuizId { get; set; }
         
         public string? QuestionType { get; set; }
         
@@ -12,12 +14,8 @@
         
         public string? AudioUrl { get; set; }
         
-        public List<QuizAnswerDto> Answers { get; set; } = new();
-        
         public string? CorrectAnswer { get; set; }
         
-        public int? TimeLimit { get; set; }
-        
-        public bool HasMedia { get; set; } 
+        public List<QuizAnswerDto> Answers { get; set; } = new();
     }
 }

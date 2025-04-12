@@ -6,14 +6,14 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace LangLearningAPI.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/LessonQuiz")]
     [ApiController]
-    public class QuizController : ControllerBase
+    public class LessonQuizController : ControllerBase
     {
         private readonly IQuizService _quizService;
-        private readonly ILogger<QuizController> _logger;
+        private readonly ILogger<LessonQuizController> _logger;
 
-        public QuizController(IQuizService quizService, ILogger<QuizController> logger)
+        public LessonQuizController(IQuizService quizService, ILogger<LessonQuizController> logger)
         {
             _quizService = quizService;
             _logger = logger;

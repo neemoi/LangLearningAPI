@@ -9,13 +9,13 @@ using Microsoft.Extensions.Logging;
 
 namespace Application.Services.Implementations.Lesson.IQuizServ
 {
-    public class QuizService : IQuizService
+    public class LessonQuizService : IQuizService
     {
         private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
-        private readonly ILogger<QuizService> _logger;
+        private readonly ILogger<LessonQuizService> _logger;
 
-        public QuizService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<QuizService> logger)
+        public LessonQuizService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<LessonQuizService> logger)
         {
             _unitOfWork = unitOfWork;
             _mapper = mapper;

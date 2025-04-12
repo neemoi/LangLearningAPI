@@ -7,12 +7,12 @@ using Microsoft.Extensions.Logging;
 
 namespace Persistance.Repository.Lesons.QuizLeson
 {
-    public class QuizRepository : IQuizRepository
+    public class LessonQuizRepository : IQuizRepository
     {
         private readonly LanguageLearningDbContext _context;
-        private readonly ILogger<QuizRepository> _logger;
+        private readonly ILogger<LessonQuizRepository> _logger;
 
-        public QuizRepository(LanguageLearningDbContext context, ILogger<QuizRepository> logger)
+        public LessonQuizRepository(LanguageLearningDbContext context, ILogger<LessonQuizRepository> logger)
         {
             _context = context;
             _logger = logger;

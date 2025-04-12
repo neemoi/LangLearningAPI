@@ -25,13 +25,16 @@ namespace Persistance.UnitOfWork
 
         public IQuizRepository QuizRepository { get; }
 
+        public IQuizQuestionRepository QuizQuestionRepository { get; }
+
         public IJwtService JwtService { get; }
 
         private readonly LanguageLearningDbContext LanguageLearningDbContext;
 
         public UnitOfWork(LanguageLearningDbContext languageLearningDbContext, IAuthRepository authRepository, IAuthEmailService emailService,
             IJwtService jwtService, IAuthEmailService authEmailService, IUserRepository userRepository, ILessonRepository lessonRepository, 
-            ILessonWordRepository lessonWordRepository, ILessonPhraseRepository lessonPhraseRepository, IQuizRepository quizRepository)
+            ILessonWordRepository lessonWordRepository, ILessonPhraseRepository lessonPhraseRepository, IQuizRepository quizRepository,
+            IQuizQuestionRepository quizQuestionRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -42,6 +45,7 @@ namespace Persistance.UnitOfWork
             LessonWordRepository = lessonWordRepository;
             LessonPhraseRepository = lessonPhraseRepository;
             QuizRepository = quizRepository;
+            QuizQuestionRepository = quizQuestionRepository;
         }
 
         public async Task SaveChangesAsync()

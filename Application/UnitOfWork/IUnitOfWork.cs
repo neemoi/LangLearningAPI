@@ -23,6 +23,8 @@ namespace Application.UnitOfWork
 
         public IQuizRepository QuizRepository { get; }
 
+        public IQuizQuestionRepository QuizQuestionRepository { get; }
+
         public IJwtService JwtService{ get; }
 
         Task SaveChangesAsync();

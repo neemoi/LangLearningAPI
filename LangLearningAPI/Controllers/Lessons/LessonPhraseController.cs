@@ -1,7 +1,6 @@
 ﻿using Application.DtoModels.Lessons.Phrasees;
 using Application.Services.Interfaces.IServices.Lesons;
 using Common.Exceptions;
-using LangLearningAPI.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LangLearningAPI.Controllers.Lessons

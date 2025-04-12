@@ -7,6 +7,7 @@ using Application.Services.Implementations.Lesson.IQuizServ;
 using Application.Services.Implementations.Lesson.Lessons;
 using Application.Services.Implementations.Lesson.Phrasees;
 using Application.Services.Implementations.Lesson.Words;
+using Application.Services.Implementations.Lessons;
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
@@ -17,6 +18,7 @@ using Application.Services.Interfaces.IServices.Profile;
 using Application.UnitOfWork;
 using Domain.Models;
 using Infrastructure.Data;
+using LangLearningAPI.Controllers.Lessons;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -24,6 +26,7 @@ using Microsoft.IdentityModel.Tokens;
 using Persistance.Repository.Auth;
 using Persistance.Repository.Lesons.Leson;
 using Persistance.Repository.Lesons.QuizLeson;
+using Persistance.Repository.Lesons.QuizQuestionRep;
 using Persistance.Repository.Lesons.Words;
 using Persistance.Repository.Lessons;
 using Persistance.Repository.Lessons.Lesson;
@@ -92,7 +95,8 @@ internal class Program
         builder.Services.AddScoped<ILessonRepository, LessonRepository>();
         builder.Services.AddScoped<ILessonWordRepository, LessonWordRepository>();
         builder.Services.AddScoped<ILessonPhraseRepository, LessonPhraseRepository>();
-        builder.Services.AddScoped<IQuizRepository, QuizRepository>();
+        builder.Services.AddScoped<IQuizRepository, LessonQuizRepository>();
+        builder.Services.AddScoped<IQuizQuestionRepository, LessonQuizQuestionRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -101,7 +105,8 @@ internal class Program
         builder.Services.AddScoped<IUserService, UserService>();
         builder.Services.AddScoped<ILessonService, LessonService>();
         builder.Services.AddScoped<ILessonPhraseService, LessonPhraseService>();
-        builder.Services.AddScoped<IQuizService, QuizService>();
+        builder.Services.AddScoped<IQuizService, LessonQuizService>();
+        builder.Services.AddScoped<IQuizQuestionService, LessonQuizQuestionService>();
         builder.Services.AddScoped<ILessonWordService, LessonWordService>();
 
         var app = builder.Build();

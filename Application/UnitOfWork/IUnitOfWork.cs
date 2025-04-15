@@ -4,6 +4,7 @@ using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
+using Application.Services.Interfaces.IServices.Lesons;
 
 namespace Application.UnitOfWork
 {
@@ -24,6 +25,8 @@ namespace Application.UnitOfWork
         public IQuizRepository QuizRepository { get; }
 
         public IQuizQuestionRepository QuizQuestionRepository { get; }
+
+        public IUserProgressRepository UserProgressRepository { get; }
 
         public IJwtService JwtService{ get; }
 

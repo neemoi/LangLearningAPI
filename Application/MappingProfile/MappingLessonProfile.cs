@@ -1,5 +1,6 @@
 ﻿using Application.DtoModels.Lessons.Lessons;
 using Application.DtoModels.Lessons.Phrasees;
+using Application.DtoModels.Lessons.Progress;
 using Application.DtoModels.Lessons.Quiz;
 using Application.DtoModels.Lessons.QuizQuestion;
 using Application.DtoModels.Lessons.Words;
@@ -59,8 +60,6 @@ namespace Application.MappingProfile
             CreateMap<QuizAnswer, QuizAnswerDto>();
             CreateMap<CreateQuizDto, QuizAnswer>();
             CreateMap<CreateQuizDto, QuizAnswer>();
-
-
         }
     }
 }

@@ -18,6 +18,8 @@ namespace Infrastructure.Data
         public DbSet<QuizAnswer>? QuizAnswers { get; set; }
         public DbSet<UserProgress>? UserProgress { get; set; }
         public DbSet<UserWordProgress>? UserWordProgress { get; set; }
+        public DbSet<AlphabetLetter> AlphabetLetters { get; set; }
+        public DbSet<NounWord> NounWords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

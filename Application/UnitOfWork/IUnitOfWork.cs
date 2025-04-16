@@ -2,6 +2,7 @@
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
+using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Lesons;
@@ -27,6 +28,10 @@ namespace Application.UnitOfWork
         public IQuizQuestionRepository QuizQuestionRepository { get; }
 
         public IUserProgressRepository UserProgressRepository { get; }
+
+        public IAlphabetLetterRepository AlphabetLetterRepository { get; }
+
+        public INounWordRepository NounWordRepository { get; }
 
         public IJwtService JwtService{ get; }
 

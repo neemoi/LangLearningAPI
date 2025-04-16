@@ -4,67 +4,93 @@
 
 namespace Persistance.Migrations
 {
-    /// <inheritdoc />
     public partial class AddPdfUrlToLessonAddCheckConstraints : Migration
     {
-        /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.AddColumn<string>(
-                 name: "PdfUrl",
-                 table: "Lessons",
-                 nullable: true,
-                 maxLength: 2000); 
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Lessons_PdfUrl",
-                table: "Lessons",
-                column: "PdfUrl");
+            DropConstraintIfExists(migrationBuilder, "quizzes", "CK_Quiz_Type");
+            DropConstraintIfExists(migrationBuilder, "lessonwords", "CK_LessonWord_Type");
+            DropConstraintIfExists(migrationBuilder, "quizquestions", "CK_QuizQuestion_QuestionType");
+            DropConstraintIfExists(migrationBuilder, "userwordprogress", "CK_UserWordProgress_QuestionType");
 
             migrationBuilder.Sql(@"
-            ALTER TABLE Quizzes
-            ADD CONSTRAINT CK_Quiz_Type
-            CHECK (Type IN ('Nouns', 'Grammar'))");
+                UPDATE quizzes 
+                SET Type = 'Nouns'
+                WHERE Type IS NULL OR Type NOT IN ('Nouns', 'Grammar')");
 
             migrationBuilder.Sql(@"
-            ALTER TABLE LessonWords
-            ADD CONSTRAINT CK_LessonWord_Type
-            CHECK (Type IN ('Keyword', 'Additional'))");
+                UPDATE lessonwords 
+                SET Type = 'Keyword'
+                WHERE Type IS NULL OR Type NOT IN ('Keyword', 'Additional')");
 
             migrationBuilder.Sql(@"
-            ALTER TABLE QuizQuestions
-            ADD CONSTRAINT CK_QuizQuestion_QuestionType
-            CHECK (QuestionType IN (
-                'ImageChoice', 
-                'AudioChoice',
-                'ImageAudioChoice', 
-                'Spelling',
-                'GrammarSelection',
-                'Pronunciation',
-                'AdvancedSurvey'
-            ))");
+                UPDATE quizquestions 
+                SET QuestionType = 'ImageChoice'
+                WHERE QuestionType IS NULL OR QuestionType NOT IN (
+                    'ImageChoice', 'AudioChoice', 'ImageAudioChoice', 
+                    'Spelling', 'GrammarSelection', 'Pronunciation', 'AdvancedSurvey'
+                )");
 
             migrationBuilder.Sql(@"
-            ALTER TABLE UserWordProgresses
-            ADD CONSTRAINT CK_UserWordProgress_QuestionType
-            CHECK (QuestionType IN (
-                'ImageChoice', 
-                'AudioChoice',
-                'ImageAudioChoice', 
-                'Spelling',
-                'GrammarSelection',
-                'Pronunciation',
-                'AdvancedSurvey'
-            ))");
+                UPDATE userwordprogress 
+                SET QuestionType = 'ImageChoice'
+                WHERE QuestionType IS NULL OR QuestionType NOT IN (
+                    'ImageChoice', 'AudioChoice', 'ImageAudioChoice', 
+                    'Spelling', 'GrammarSelection', 'Pronunciation', 'AdvancedSurvey'
+                )");
+
+            migrationBuilder.Sql(@"
+                ALTER TABLE quizzes
+                ADD CONSTRAINT CK_Quiz_Type
+                CHECK (Type IN ('Nouns', 'Grammar'))");
+
+            migrationBuilder.Sql(@"
+                ALTER TABLE lessonwords
+                ADD CONSTRAINT CK_LessonWord_Type
+                CHECK (Type IN ('Keyword', 'Additional'))");
+
+            migrationBuilder.Sql(@"
+                ALTER TABLE quizquestions
+                ADD CONSTRAINT CK_QuizQuestion_QuestionType
+                CHECK (QuestionType IN (
+                    'ImageChoice', 'AudioChoice', 'ImageAudioChoice', 
+                    'Spelling', 'GrammarSelection', 'Pronunciation', 'AdvancedSurvey'
+                ))");
+
+            migrationBuilder.Sql(@"
+                ALTER TABLE userwordprogress
+                ADD CONSTRAINT CK_UserWordProgress_QuestionType
+                CHECK (QuestionType IN (
+                    'ImageChoice', 'AudioChoice', 'ImageAudioChoice', 
+                    'Spelling', 'GrammarSelection', 'Pronunciation', 'AdvancedSurvey'
+                ))");
         }
 
-        /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.Sql("ALTER TABLE Quizzes DROP CONSTRAINT CK_Quiz_Type");
-            migrationBuilder.Sql("ALTER TABLE LessonWords DROP CONSTRAINT CK_LessonWord_Type");
-            migrationBuilder.Sql("ALTER TABLE QuizQuestions DROP CONSTRAINT CK_QuizQuestion_QuestionType");
-            migrationBuilder.Sql("ALTER TABLE UserWordProgresses DROP CONSTRAINT CK_UserWordProgress_QuestionType");
+            DropConstraintIfExists(migrationBuilder, "quizzes", "CK_Quiz_Type");
+            DropConstraintIfExists(migrationBuilder, "lessonwords", "CK_LessonWord_Type");
+            DropConstraintIfExists(migrationBuilder, "quizquestions", "CK_QuizQuestion_QuestionType");
+            DropConstraintIfExists(migrationBuilder, "userwordprogress", "CK_UserWordProgress_QuestionType");
+        }
+
+        private void DropConstraintIfExists(MigrationBuilder migrationBuilder, string tableName, string constraintName)
+        {
+            migrationBuilder.Sql($@"
+                SET @dbname = DATABASE();
+                SET @tablename = '{tableName}';
+                SET @constraintname = '{constraintName}';
+                SET @preparedStatement = (SELECT IF(
+                    (SELECT COUNT(*) FROM INFORMATION_SCHEMA.TABLE_CONSTRAINTS 
+                     WHERE CONSTRAINT_SCHEMA = @dbname 
+                     AND TABLE_NAME = @tablename 
+                     AND CONSTRAINT_NAME = @constraintname) > 0,
+                    CONCAT('ALTER TABLE ', @tablename, ' DROP CONSTRAINT ', @constraintname),
+                    'SELECT 1'
+                ));
+                PREPARE stmt FROM @preparedStatement;
+                EXECUTE stmt;
+                DEALLOCATE PREPARE stmt;");
         }
     }
 }

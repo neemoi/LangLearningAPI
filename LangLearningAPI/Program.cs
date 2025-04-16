@@ -9,12 +9,15 @@ using Application.Services.Implementations.Lesson.Phrasees;
 using Application.Services.Implementations.Lesson.Progress;
 using Application.Services.Implementations.Lesson.Words;
 using Application.Services.Implementations.Lessons;
+using Application.Services.Implementations.Nouns;
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
+using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Lesons;
+using Application.Services.Interfaces.IServices.Nouns;
 using Application.Services.Interfaces.IServices.Profile;
 using Application.UnitOfWork;
 using Domain.Models;
@@ -30,6 +33,7 @@ using Persistance.Repository.Lesons.QuizLeson;
 using Persistance.Repository.Lesons.QuizQuestionRep;
 using Persistance.Repository.Lesons.Words;
 using Persistance.Repository.Lessons.Lesson;
+using Persistance.Repository.Nouns;
 using Persistance.Repository.Userfsf;
 using Persistance.UnitOfWork;
 using System.Text;
@@ -88,7 +92,7 @@ internal class Program
         builder.Services.AddLogging();
 
         builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile), typeof(MappingLessonWordProfile), 
-            typeof(MappingLessonPhraseProfile), typeof(MappingUserProgressProfile));
+            typeof(MappingLessonPhraseProfile), typeof(MappingUserProgressProfile), typeof(MappingNounsProfile));
 
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -98,6 +102,8 @@ internal class Program
         builder.Services.AddScoped<IQuizRepository, LessonQuizRepository>();
         builder.Services.AddScoped<IQuizQuestionRepository, LessonQuizQuestionRepository>();
         builder.Services.AddScoped<IUserProgressRepository, UserProgressRepository>();
+        builder.Services.AddScoped<IAlphabetLetterRepository, AlphabetLetterRepository>();
+        builder.Services.AddScoped<INounWordRepository, NounWordRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -109,6 +115,8 @@ internal class Program
         builder.Services.AddScoped<IQuizService, LessonQuizService>();
         builder.Services.AddScoped<IQuizQuestionService, LessonQuizQuestionService>();
         builder.Services.AddScoped<IUserProgressService, UserProgressService>();
+        builder.Services.AddScoped<IAlphabetLetterService, AlphabetLetterService>();
+        builder.Services.AddScoped<INounWordService, NounWordService>();
         builder.Services.AddScoped<ILessonWordService, LessonWordService>();
 
         var app = builder.Build();

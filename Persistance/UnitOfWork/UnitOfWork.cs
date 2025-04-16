@@ -2,6 +2,7 @@
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
+using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Lesons;
@@ -30,14 +31,19 @@ namespace Persistance.UnitOfWork
 
         public IUserProgressRepository UserProgressRepository { get;  }
 
+        public IAlphabetLetterRepository AlphabetLetterRepository { get; }
+
+        public INounWordRepository NounWordRepository { get; }
+
         public IJwtService JwtService { get; }
 
         private readonly LanguageLearningDbContext LanguageLearningDbContext;
 
         public UnitOfWork(LanguageLearningDbContext languageLearningDbContext, IAuthRepository authRepository, IAuthEmailService emailService,
-            IJwtService jwtService, IAuthEmailService authEmailService, IUserRepository userRepository, ILessonRepository lessonRepository, 
+            IJwtService jwtService, IAuthEmailService authEmailService, IUserRepository userRepository, ILessonRepository lessonRepository,
             ILessonWordRepository lessonWordRepository, ILessonPhraseRepository lessonPhraseRepository, IQuizRepository quizRepository,
-            IQuizQuestionRepository quizQuestionRepository, IUserProgressRepository userProgressRepository)
+            IQuizQuestionRepository quizQuestionRepository, IUserProgressRepository userProgressRepository, IAlphabetLetterRepository alphabetLetterRepository,
+            INounWordRepository nounWordRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -50,6 +56,8 @@ namespace Persistance.UnitOfWork
             QuizRepository = quizRepository;
             QuizQuestionRepository = quizQuestionRepository;
             UserProgressRepository = userProgressRepository;
+            AlphabetLetterRepository = alphabetLetterRepository;
+            NounWordRepository = nounWordRepository;
         }
 
         public async Task SaveChangesAsync()

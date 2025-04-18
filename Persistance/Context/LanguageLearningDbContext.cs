@@ -20,6 +20,8 @@ namespace Infrastructure.Data
         public DbSet<UserWordProgress>? UserWordProgress { get; set; }
         public DbSet<AlphabetLetter> AlphabetLetters { get; set; }
         public DbSet<NounWord> NounWords { get; set; }
+        public DbSet<PartOfSpeech> PartOfSpeechs { get; set; }
+        public DbSet<FunctionWord> FunctionWords { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

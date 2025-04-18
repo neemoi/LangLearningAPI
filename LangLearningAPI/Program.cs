@@ -3,6 +3,7 @@ using Application.MappingProfile;
 using Application.Services.Implementations;
 using Application.Services.Implementations.Auth;
 using Application.Services.Implementations.Auth.JWT;
+using Application.Services.Implementations.Functions;
 using Application.Services.Implementations.Lesson.IQuizServ;
 using Application.Services.Implementations.Lesson.Lessons;
 using Application.Services.Implementations.Lesson.Phrasees;
@@ -11,11 +12,13 @@ using Application.Services.Implementations.Lesson.Words;
 using Application.Services.Implementations.Lessons;
 using Application.Services.Implementations.Nouns;
 using Application.Services.Interfaces.IRepository.Auth;
+using Application.Services.Interfaces.IRepository.Functions;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IServices.Auth;
+using Application.Services.Interfaces.IServices.Functions;
 using Application.Services.Interfaces.IServices.Lesons;
 using Application.Services.Interfaces.IServices.Nouns;
 using Application.Services.Interfaces.IServices.Profile;
@@ -27,6 +30,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistance.Repository.Auth;
+using Persistance.Repository.Functions;
 using Persistance.Repository.Lesons.Leson;
 using Persistance.Repository.Lesons.Progress;
 using Persistance.Repository.Lesons.QuizLeson;
@@ -92,7 +96,8 @@ internal class Program
         builder.Services.AddLogging();
 
         builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile), typeof(MappingLessonWordProfile), 
-            typeof(MappingLessonPhraseProfile), typeof(MappingUserProgressProfile), typeof(MappingNounsProfile));
+            typeof(MappingLessonPhraseProfile), typeof(MappingUserProgressProfile), typeof(MappingNounsProfile),
+            typeof(MappingFunctionWordProfile));
 
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -104,6 +109,8 @@ internal class Program
         builder.Services.AddScoped<IUserProgressRepository, UserProgressRepository>();
         builder.Services.AddScoped<IAlphabetLetterRepository, AlphabetLetterRepository>();
         builder.Services.AddScoped<INounWordRepository, NounWordRepository>();
+        builder.Services.AddScoped<IFunctionWordRepository, FunctionWordRepository>();
+        builder.Services.AddScoped<IPartOfSpeechRepository, PartOfSpeechRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -117,6 +124,8 @@ internal class Program
         builder.Services.AddScoped<IUserProgressService, UserProgressService>();
         builder.Services.AddScoped<IAlphabetLetterService, AlphabetLetterService>();
         builder.Services.AddScoped<INounWordService, NounWordService>();
+        builder.Services.AddScoped<IFunctionWordService, FunctionWordService>();
+        builder.Services.AddScoped<IPartOfSpeechService, PartOfSpeechService>();
         builder.Services.AddScoped<ILessonWordService, LessonWordService>();
 
         var app = builder.Build();

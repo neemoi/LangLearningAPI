@@ -1,5 +1,6 @@
 ﻿using Application.Services.Implementations.Auth.JWT;
 using Application.Services.Interfaces.IRepository.Auth;
+using Application.Services.Interfaces.IRepository.Functions;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.Nouns;
@@ -35,6 +36,10 @@ namespace Persistance.UnitOfWork
 
         public INounWordRepository NounWordRepository { get; }
 
+        public IFunctionWordRepository FunctionWordRepository { get; }
+
+        public IPartOfSpeechRepository PartOfSpeechRepository { get; }
+        
         public IJwtService JwtService { get; }
 
         private readonly LanguageLearningDbContext LanguageLearningDbContext;
@@ -43,7 +48,7 @@ namespace Persistance.UnitOfWork
             IJwtService jwtService, IAuthEmailService authEmailService, IUserRepository userRepository, ILessonRepository lessonRepository,
             ILessonWordRepository lessonWordRepository, ILessonPhraseRepository lessonPhraseRepository, IQuizRepository quizRepository,
             IQuizQuestionRepository quizQuestionRepository, IUserProgressRepository userProgressRepository, IAlphabetLetterRepository alphabetLetterRepository,
-            INounWordRepository nounWordRepository)
+            INounWordRepository nounWordRepository, IFunctionWordRepository functionWordRepository, IPartOfSpeechRepository partOfSpeechRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -58,6 +63,8 @@ namespace Persistance.UnitOfWork
             UserProgressRepository = userProgressRepository;
             AlphabetLetterRepository = alphabetLetterRepository;
             NounWordRepository = nounWordRepository;
+            FunctionWordRepository = functionWordRepository;
+            PartOfSpeechRepository = partOfSpeechRepository;
         }
 
         public async Task SaveChangesAsync()

@@ -1,5 +1,6 @@
 ﻿using Application.Services.Implementations.Auth.JWT;
 using Application.Services.Interfaces.IRepository.Auth;
+using Application.Services.Interfaces.IRepository.Functions;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.Nouns;
@@ -32,6 +33,10 @@ namespace Application.UnitOfWork
         public IAlphabetLetterRepository AlphabetLetterRepository { get; }
 
         public INounWordRepository NounWordRepository { get; }
+
+        public IFunctionWordRepository FunctionWordRepository { get;  }
+
+        public IPartOfSpeechRepository PartOfSpeechRepository { get; }
 
         public IJwtService JwtService{ get; }
 

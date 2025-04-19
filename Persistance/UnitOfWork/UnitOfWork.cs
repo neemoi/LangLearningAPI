@@ -5,6 +5,7 @@ using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
+using Application.Services.Interfaces.IRepository.Pronunciation;
 using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Lesons;
 using Application.UnitOfWork;
@@ -39,7 +40,9 @@ namespace Persistance.UnitOfWork
         public IFunctionWordRepository FunctionWordRepository { get; }
 
         public IPartOfSpeechRepository PartOfSpeechRepository { get; }
-        
+
+        public IPronunciationRepository PronunciationRepository { get; }
+
         public IJwtService JwtService { get; }
 
         private readonly LanguageLearningDbContext LanguageLearningDbContext;
@@ -48,7 +51,8 @@ namespace Persistance.UnitOfWork
             IJwtService jwtService, IAuthEmailService authEmailService, IUserRepository userRepository, ILessonRepository lessonRepository,
             ILessonWordRepository lessonWordRepository, ILessonPhraseRepository lessonPhraseRepository, IQuizRepository quizRepository,
             IQuizQuestionRepository quizQuestionRepository, IUserProgressRepository userProgressRepository, IAlphabetLetterRepository alphabetLetterRepository,
-            INounWordRepository nounWordRepository, IFunctionWordRepository functionWordRepository, IPartOfSpeechRepository partOfSpeechRepository)
+            INounWordRepository nounWordRepository, IFunctionWordRepository functionWordRepository, IPartOfSpeechRepository partOfSpeechRepository,
+            IPronunciationRepository pronunciationRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -65,6 +69,7 @@ namespace Persistance.UnitOfWork
             NounWordRepository = nounWordRepository;
             FunctionWordRepository = functionWordRepository;
             PartOfSpeechRepository = partOfSpeechRepository;
+            PronunciationRepository = pronunciationRepository;
         }
 
         public async Task SaveChangesAsync()

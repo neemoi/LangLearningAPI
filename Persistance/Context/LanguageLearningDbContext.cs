@@ -22,6 +22,8 @@ namespace Infrastructure.Data
         public DbSet<NounWord> NounWords { get; set; }
         public DbSet<PartOfSpeech> PartOfSpeechs { get; set; }
         public DbSet<FunctionWord> FunctionWords { get; set; }
+        public DbSet<WordItem> WordItems { get; set; }
+        public DbSet<PronunciationCategory> PronunciationCategories{ get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

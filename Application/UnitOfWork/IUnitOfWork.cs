@@ -3,6 +3,7 @@ using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Functions;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
+using Application.Services.Interfaces.IRepository.MainQuestions;
 using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IRepository.Pronunciation;
@@ -40,6 +41,8 @@ namespace Application.UnitOfWork
         public IPartOfSpeechRepository PartOfSpeechRepository { get; }
 
         public IPronunciationRepository PronunciationRepository { get; }
+
+        public IMainQuestionRepository MainQuestionRepository { get; }
 
         public IJwtService JwtService{ get; }
 

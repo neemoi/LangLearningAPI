@@ -3,6 +3,7 @@ using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Functions;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
+using Application.Services.Interfaces.IRepository.MainQuestions;
 using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IRepository.Pronunciation;
@@ -43,6 +44,8 @@ namespace Persistance.UnitOfWork
 
         public IPronunciationRepository PronunciationRepository { get; }
 
+        public IMainQuestionRepository MainQuestionRepository { get; }
+
         public IJwtService JwtService { get; }
 
         private readonly LanguageLearningDbContext LanguageLearningDbContext;
@@ -52,7 +55,7 @@ namespace Persistance.UnitOfWork
             ILessonWordRepository lessonWordRepository, ILessonPhraseRepository lessonPhraseRepository, IQuizRepository quizRepository,
             IQuizQuestionRepository quizQuestionRepository, IUserProgressRepository userProgressRepository, IAlphabetLetterRepository alphabetLetterRepository,
             INounWordRepository nounWordRepository, IFunctionWordRepository functionWordRepository, IPartOfSpeechRepository partOfSpeechRepository,
-            IPronunciationRepository pronunciationRepository)
+            IPronunciationRepository pronunciationRepository, IMainQuestionRepository mainQuestionRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -70,6 +73,7 @@ namespace Persistance.UnitOfWork
             FunctionWordRepository = functionWordRepository;
             PartOfSpeechRepository = partOfSpeechRepository;
             PronunciationRepository = pronunciationRepository;
+            MainQuestionRepository = mainQuestionRepository;
         }
 
         public async Task SaveChangesAsync()

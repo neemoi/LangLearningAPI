@@ -4,16 +4,19 @@ using Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace Persistance.Migrations
+namespace Persistance.Context.Migrations
 {
     [DbContext(typeof(LanguageLearningDbContext))]
-    partial class LanguageLearningDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250423184655_EnglishNameModels")]
+    partial class EnglishNameModels
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -72,10 +75,6 @@ namespace Persistance.Migrations
 
                     b.Property<int>("EnglishNameId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 
@@ -256,10 +255,6 @@ namespace Persistance.Migrations
 
                     b.Property<int>("EnglishNameId")
                         .HasColumnType("int");
-
-                    b.Property<string>("Name")
-                        .IsRequired()
-                        .HasColumnType("longtext");
 
                     b.HasKey("Id");
 

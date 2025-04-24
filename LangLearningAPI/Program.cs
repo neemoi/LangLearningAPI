@@ -11,6 +11,7 @@ using Application.Services.Implementations.Lesson.Progress;
 using Application.Services.Implementations.Lesson.Words;
 using Application.Services.Implementations.Lessons;
 using Application.Services.Implementations.MainQuestions;
+using Application.Services.Implementations.Name;
 using Application.Services.Implementations.Nouns;
 using Application.Services.Implementations.Pronunciation;
 using Application.Services.Interfaces.IRepository.Auth;
@@ -18,6 +19,7 @@ using Application.Services.Interfaces.IRepository.Functions;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.MainQuestions;
+using Application.Services.Interfaces.IRepository.Name;
 using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IRepository.Pronunciation;
@@ -25,6 +27,7 @@ using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Functions;
 using Application.Services.Interfaces.IServices.Lesons;
 using Application.Services.Interfaces.IServices.MainQuestions;
+using Application.Services.Interfaces.IServices.Name;
 using Application.Services.Interfaces.IServices.Nouns;
 using Application.Services.Interfaces.IServices.Profile;
 using Application.Services.Interfaces.IServices.Pronunciation;
@@ -43,6 +46,7 @@ using Persistance.Repository.Lesons.QuizLeson;
 using Persistance.Repository.Lesons.QuizQuestionRep;
 using Persistance.Repository.Lesons.Words;
 using Persistance.Repository.Lessons.Lesson;
+using Persistance.Repository.Name;
 using Persistance.Repository.Nouns;
 using Persistance.Repository.Pronunciation;
 using Persistance.Repository.Userfsf;
@@ -105,7 +109,8 @@ internal class Program
 
         builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile), typeof(MappingLessonWordProfile), 
             typeof(MappingLessonPhraseProfile), typeof(MappingUserProgressProfile), typeof(MappingNounsProfile),
-            typeof(MappingFunctionWordProfile), typeof(MappingPronunciationMappingProfile), typeof(MappingMainQuestionProfile));
+            typeof(MappingFunctionWordProfile), typeof(MappingPronunciationMappingProfile), typeof(MappingMainQuestionProfile),
+            typeof(MappingNameProfile));
 
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -121,6 +126,9 @@ internal class Program
         builder.Services.AddScoped<IPartOfSpeechRepository, PartOfSpeechRepository>();
         builder.Services.AddScoped<IPronunciationRepository, PronunciationRepository>();
         builder.Services.AddScoped<IMainQuestionRepository, MainQuestionRepository>();
+        builder.Services.AddScoped<IMaleNameRepository, MaleNameRepository>();
+        builder.Services.AddScoped<IFemaleNameRepository, FemaleNameRepository>();
+        builder.Services.AddScoped<IEnglishNameRepository, EnglishNameRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -139,6 +147,10 @@ internal class Program
         builder.Services.AddScoped<IPronunciationService, PronunciationService>();
         builder.Services.AddScoped<ILessonWordService, LessonWordService>();
         builder.Services.AddScoped<IMainQuestionService, MainQuestionService>();
+        builder.Services.AddScoped<IMaleNameService, MaleNameService>();
+        builder.Services.AddScoped<IFemaleNameService, FemaleNameService>();
+        builder.Services.AddScoped<INameService, NameService>();
+        builder.Services.AddScoped<INameService, NameService>();
 
         var app = builder.Build();
 

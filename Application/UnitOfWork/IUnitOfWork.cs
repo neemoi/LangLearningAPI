@@ -4,6 +4,7 @@ using Application.Services.Interfaces.IRepository.Functions;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.MainQuestions;
+using Application.Services.Interfaces.IRepository.Name;
 using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IRepository.Pronunciation;
@@ -43,6 +44,12 @@ namespace Application.UnitOfWork
         public IPronunciationRepository PronunciationRepository { get; }
 
         public IMainQuestionRepository MainQuestionRepository { get; }
+
+        public IFemaleNameRepository FemaleNameRepository { get; }
+
+        public IMaleNameRepository MaleNameRepository { get; }
+
+        public IEnglishNameRepository EnglishNameRepository { get; }
 
         public IJwtService JwtService{ get; }
 

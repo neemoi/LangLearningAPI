@@ -26,6 +26,9 @@ namespace Infrastructure.Data
         public DbSet<PronunciationCategory> PronunciationCategories{ get; set; }
         public DbSet<MainQuestionWord> MainQuestionWords{ get; set; }
         public DbSet<MainQuestion> MainQuestions{ get; set; }
+        public DbSet<EnglishName> EnglishNames { get; set; }
+        public DbSet<FemaleName> FemaleNames { get; set; }
+        public DbSet<MaleName> MaleNames { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {

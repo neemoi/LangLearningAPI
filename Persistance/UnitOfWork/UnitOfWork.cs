@@ -4,6 +4,7 @@ using Application.Services.Interfaces.IRepository.Functions;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.MainQuestions;
+using Application.Services.Interfaces.IRepository.Name;
 using Application.Services.Interfaces.IRepository.Nouns;
 using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IRepository.Pronunciation;
@@ -46,6 +47,12 @@ namespace Persistance.UnitOfWork
 
         public IMainQuestionRepository MainQuestionRepository { get; }
 
+        public IFemaleNameRepository FemaleNameRepository { get; }
+
+        public IMaleNameRepository MaleNameRepository { get; }
+
+        public IEnglishNameRepository EnglishNameRepository { get; }
+
         public IJwtService JwtService { get; }
 
         private readonly LanguageLearningDbContext LanguageLearningDbContext;
@@ -55,7 +62,8 @@ namespace Persistance.UnitOfWork
             ILessonWordRepository lessonWordRepository, ILessonPhraseRepository lessonPhraseRepository, IQuizRepository quizRepository,
             IQuizQuestionRepository quizQuestionRepository, IUserProgressRepository userProgressRepository, IAlphabetLetterRepository alphabetLetterRepository,
             INounWordRepository nounWordRepository, IFunctionWordRepository functionWordRepository, IPartOfSpeechRepository partOfSpeechRepository,
-            IPronunciationRepository pronunciationRepository, IMainQuestionRepository mainQuestionRepository)
+            IPronunciationRepository pronunciationRepository, IMainQuestionRepository mainQuestionRepository, IFemaleNameRepository femaleNameRepository,
+            IMaleNameRepository maleNameRepository, IEnglishNameRepository englishNameRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -74,6 +82,9 @@ namespace Persistance.UnitOfWork
             PartOfSpeechRepository = partOfSpeechRepository;
             PronunciationRepository = pronunciationRepository;
             MainQuestionRepository = mainQuestionRepository;
+            FemaleNameRepository = femaleNameRepository;
+            MaleNameRepository = maleNameRepository;
+            EnglishNameRepository = englishNameRepository;
         }
 
         public async Task SaveChangesAsync()

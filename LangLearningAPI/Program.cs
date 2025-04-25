@@ -4,6 +4,7 @@ using Application.Services.Implementations;
 using Application.Services.Implementations.Auth;
 using Application.Services.Implementations.Auth.JWT;
 using Application.Services.Implementations.Functions;
+using Application.Services.Implementations.KidQuiz;
 using Application.Services.Implementations.Lesson.IQuizServ;
 using Application.Services.Implementations.Lesson.Lessons;
 using Application.Services.Implementations.Lesson.Phrasees;
@@ -16,6 +17,7 @@ using Application.Services.Implementations.Nouns;
 using Application.Services.Implementations.Pronunciation;
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Functions;
+using Application.Services.Interfaces.IRepository.KidQuiz;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.MainQuestions;
@@ -25,6 +27,7 @@ using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IRepository.Pronunciation;
 using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Functions;
+using Application.Services.Interfaces.IServices.KidQuiz;
 using Application.Services.Interfaces.IServices.Lesons;
 using Application.Services.Interfaces.IServices.MainQuestions;
 using Application.Services.Interfaces.IServices.Name;
@@ -110,7 +113,7 @@ internal class Program
         builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile), typeof(MappingLessonWordProfile), 
             typeof(MappingLessonPhraseProfile), typeof(MappingUserProgressProfile), typeof(MappingNounsProfile),
             typeof(MappingFunctionWordProfile), typeof(MappingPronunciationMappingProfile), typeof(MappingMainQuestionProfile),
-            typeof(MappingNameProfile));
+            typeof(MappingNameProfile), typeof(MappingKidLessonProfile));
 
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -129,6 +132,7 @@ internal class Program
         builder.Services.AddScoped<IMaleNameRepository, MaleNameRepository>();
         builder.Services.AddScoped<IFemaleNameRepository, FemaleNameRepository>();
         builder.Services.AddScoped<IEnglishNameRepository, EnglishNameRepository>();
+        builder.Services.AddScoped<IKidLessonRepository, KidLessonRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -150,7 +154,8 @@ internal class Program
         builder.Services.AddScoped<IMaleNameService, MaleNameService>();
         builder.Services.AddScoped<IFemaleNameService, FemaleNameService>();
         builder.Services.AddScoped<INameService, NameService>();
-        builder.Services.AddScoped<INameService, NameService>();
+        builder.Services.AddScoped<IKidLessonService, KidLessonService>();
+        builder.Services.AddScoped<KidLessonService>();  
 
         var app = builder.Build();
 

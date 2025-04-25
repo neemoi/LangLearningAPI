@@ -29,6 +29,11 @@ namespace Infrastructure.Data
         public DbSet<EnglishName> EnglishNames { get; set; }
         public DbSet<FemaleName> FemaleNames { get; set; }
         public DbSet<MaleName> MaleNames { get; set; }
+        public DbSet<KidLesson> KidLessons { get; set; }
+        public DbSet<KidWordCard> KidWordCards { get; set; }
+        public DbSet<KidQuizType> KidQuizTypes { get; set; }
+        public DbSet<KidQuizQuestion> KidQuizQuestions { get; set; }
+        public DbSet<KidQuizAnswer> KidQuizAnswers { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -108,6 +113,13 @@ namespace Infrastructure.Data
                 entity.HasIndex(l => l.Title);
                 entity.HasIndex(l => l.PdfUrl);
             });
+
+            modelBuilder.Entity<KidQuizType>().HasData(
+                new KidQuizType { Id = 1, Name = "image_choice" },
+                new KidQuizType { Id = 2, Name = "audio_choice" },
+                new KidQuizType { Id = 3, Name = "image_audio_choice" },
+                new KidQuizType { Id = 4, Name = "spelling" }
+            );
 
             modelBuilder.Entity<Quiz>()
                 .HasIndex(q => q.LessonId);

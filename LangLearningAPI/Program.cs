@@ -43,6 +43,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Persistance.Repository.Auth;
 using Persistance.Repository.Functions;
+using Persistance.Repository.KidQuiz;
 using Persistance.Repository.Lesons.Leson;
 using Persistance.Repository.Lesons.Progress;
 using Persistance.Repository.Lesons.QuizLeson;
@@ -113,7 +114,7 @@ internal class Program
         builder.Services.AddAutoMapper(typeof(MappingAuthProfile), typeof(MappingUserProfile), typeof(MappingLessonWordProfile), 
             typeof(MappingLessonPhraseProfile), typeof(MappingUserProgressProfile), typeof(MappingNounsProfile),
             typeof(MappingFunctionWordProfile), typeof(MappingPronunciationMappingProfile), typeof(MappingMainQuestionProfile),
-            typeof(MappingNameProfile), typeof(MappingKidLessonProfile));
+            typeof(MappingNameProfile), typeof(MappingKidLessonProfile), typeof(MappingKidWordCardProfile));
 
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -133,6 +134,7 @@ internal class Program
         builder.Services.AddScoped<IFemaleNameRepository, FemaleNameRepository>();
         builder.Services.AddScoped<IEnglishNameRepository, EnglishNameRepository>();
         builder.Services.AddScoped<IKidLessonRepository, KidLessonRepository>();
+        builder.Services.AddScoped<IKidWordCardRepository, KidWordCardRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -155,6 +157,7 @@ internal class Program
         builder.Services.AddScoped<IFemaleNameService, FemaleNameService>();
         builder.Services.AddScoped<INameService, NameService>();
         builder.Services.AddScoped<IKidLessonService, KidLessonService>();
+        builder.Services.AddScoped<IKidWordCardService, KidWordCardService>();
         builder.Services.AddScoped<KidLessonService>();  
 
         var app = builder.Build();

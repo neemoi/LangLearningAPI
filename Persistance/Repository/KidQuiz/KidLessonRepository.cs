@@ -23,7 +23,14 @@ public class KidLessonRepository : IKidLessonRepository
     {
         try
         {
-            var lessons = await _context.KidLessons.ToListAsync();
+            _logger.LogInformation("Retrieving all KidLessons with WordCards...");
+
+            var lessons = await _context.KidLessons
+                .Include(x => x.WordCards)
+                .ToListAsync();
+
+            _logger.LogInformation("Successfully retrieved {Count} KidLessons", lessons.Count);
+
             return _mapper.Map<List<KidLessonDto>>(lessons);
         }
         catch (Exception ex)
@@ -37,13 +44,20 @@ public class KidLessonRepository : IKidLessonRepository
     {
         try
         {
-            var lesson = await _context.KidLessons.FindAsync(id);
+            _logger.LogInformation("Retrieving KidLesson with ID {Id}", id);
+
+            var lesson = await _context.KidLessons
+                .Include(x => x.WordCards)
+                .FirstOrDefaultAsync(x => x.Id == id);
+
             if (lesson == null)
             {
                 _logger.LogWarning("KidLesson with ID {Id} not found", id);
                 return null;
             }
 
+            _logger.LogInformation("Successfully retrieved KidLesson with ID {Id}", id);
+            
             return _mapper.Map<KidLesson>(lesson);
         }
         catch (Exception ex)
@@ -57,10 +71,21 @@ public class KidLessonRepository : IKidLessonRepository
     {
         try
         {
-            _context.KidLessons.Add(lesson);
-            await _context.SaveChangesAsync();
+            _logger.LogInformation("Creating new KidLesson...");
 
-            return _mapper.Map<KidLessonDto>(lesson);
+            _context.KidLessons.Add(lesson);
+            var result = await _context.SaveChangesAsync();
+
+            if (result > 0)
+            {
+                _logger.LogInformation("Successfully created KidLesson with ID {Id}", lesson.Id);
+                return _mapper.Map<KidLessonDto>(lesson);
+            }
+            else
+            {
+                _logger.LogWarning("No changes were made while creating KidLesson");
+                return null;
+            }
         }
         catch (Exception ex)
         {
@@ -73,6 +98,8 @@ public class KidLessonRepository : IKidLessonRepository
     {
         try
         {
+            _logger.LogInformation("Updating KidLesson with ID {Id}", id);
+
             var existingLesson = await _context.KidLessons.FindAsync(id);
             if (existingLesson == null)
             {
@@ -84,7 +111,15 @@ public class KidLessonRepository : IKidLessonRepository
             existingLesson.Description = lesson.Description ?? existingLesson.Description;
             existingLesson.ImageUrl = lesson.ImageUrl ?? existingLesson.ImageUrl;
 
-            await _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
+            if (result > 0)
+            {
+                _logger.LogInformation("Successfully updated KidLesson with ID {Id}", id);
+            }
+            else
+            {
+                _logger.LogWarning("No changes were made while updating KidLesson with ID {Id}", id);
+            }
 
             return existingLesson;
         }
@@ -99,6 +134,8 @@ public class KidLessonRepository : IKidLessonRepository
     {
         try
         {
+            _logger.LogInformation("Deleting KidLesson with ID {Id}", id);
+
             var lesson = await _context.KidLessons.FindAsync(id);
             if (lesson == null)
             {
@@ -107,9 +144,18 @@ public class KidLessonRepository : IKidLessonRepository
             }
 
             _context.KidLessons.Remove(lesson);
-            await _context.SaveChangesAsync();
+            var result = await _context.SaveChangesAsync();
 
-            return _mapper.Map<KidLessonDto>(lesson);
+            if (result > 0)
+            {
+                _logger.LogInformation("Successfully deleted KidLesson with ID {Id}", id);
+                return _mapper.Map<KidLessonDto>(lesson);
+            }
+            else
+            {
+                _logger.LogWarning("No changes were made while deleting KidLesson with ID {Id}", id);
+                return null;
+            }
         }
         catch (Exception ex)
         {

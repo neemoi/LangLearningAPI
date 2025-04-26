@@ -1,6 +1,6 @@
 ﻿using Application.DtoModels.KidQuiz.Lessons;
-using Application.Services.Interfaces.IRepository.KidQuiz;
 using Application.Services.Interfaces.IServices.KidQuiz;
+using Application.UnitOfWork;
 using AutoMapper;
 using Domain.Models;
 using Microsoft.Extensions.Logging;
@@ -9,13 +9,13 @@ namespace Application.Services.Implementations.KidQuiz
 {
     public class KidLessonService : IKidLessonService
     {
-        private readonly IKidLessonRepository _repository;
+        private readonly IUnitOfWork _unitOfWork;
         private readonly IMapper _mapper;
         private readonly ILogger<KidLessonService> _logger;
 
-        public KidLessonService(IKidLessonRepository repository, IMapper mapper, ILogger<KidLessonService> logger)
+        public KidLessonService(IUnitOfWork unitOfWork, IMapper mapper, ILogger<KidLessonService> logger)
         {
-            _repository = repository;
+            _unitOfWork = unitOfWork;
             _mapper = mapper;
             _logger = logger;
         }
@@ -24,7 +24,9 @@ namespace Application.Services.Implementations.KidQuiz
         {
             try
             {
-                var lessons = await _repository.GetAllLessonsAsync();
+                var lessons = await _unitOfWork.KidLessonRepository.GetAllLessonsAsync();
+                _logger.LogInformation("Successfully retrieved {Count} KidLessons", lessons.Count);
+                
                 return _mapper.Map<List<KidLessonDto>>(lessons);
             }
             catch (Exception ex)
@@ -38,8 +40,16 @@ namespace Application.Services.Implementations.KidQuiz
         {
             try
             {
-                var lesson = await _repository.GetLessonByIdAsync(id);
-                return lesson == null ? null : _mapper.Map<KidLessonDto>(lesson);
+                var lesson = await _unitOfWork.KidLessonRepository.GetLessonByIdAsync(id);
+                if (lesson == null)
+                {
+                    _logger.LogWarning("KidLesson with ID {Id} not found in service layer", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Successfully retrieved KidLesson with ID {Id}", id);
+               
+                return _mapper.Map<KidLessonDto>(lesson);
             }
             catch (Exception ex)
             {
@@ -53,13 +63,21 @@ namespace Application.Services.Implementations.KidQuiz
             try
             {
                 var lesson = _mapper.Map<KidLesson>(dto);
-                var createdLesson = await _repository.CreateLessonAsync(lesson);
+                var createdLesson = await _unitOfWork.KidLessonRepository.CreateLessonAsync(lesson);
 
+                if (createdLesson == null)
+                {
+                    _logger.LogWarning("Failed to create KidLesson - repository returned null");
+                    return null;
+                }
+
+                _logger.LogInformation("Successfully created KidLesson with ID {Id}", createdLesson.Id);
                 return _mapper.Map<KidLessonDto>(createdLesson);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Failed to create KidLesson in the service layer");
+                
                 return null;
             }
         }
@@ -68,16 +86,27 @@ namespace Application.Services.Implementations.KidQuiz
         {
             try
             {
-                var existingLesson = await _repository.GetLessonByIdAsync(id);
-                if (existingLesson == null) return null;
+                var existingLesson = await _unitOfWork.KidLessonRepository.GetLessonByIdAsync(id);
+                if (existingLesson == null)
+                {
+                    _logger.LogWarning("KidLesson with ID {Id} not found for update", id);
+                    return null;
+                }
 
                 existingLesson.Title = !string.IsNullOrEmpty(dto.Title) ? dto.Title : existingLesson.Title;
                 existingLesson.Description = !string.IsNullOrEmpty(dto.Description) ? dto.Description : existingLesson.Description;
                 existingLesson.ImageUrl = !string.IsNullOrEmpty(dto.ImageUrl) ? dto.ImageUrl : existingLesson.ImageUrl;
 
-                var updatedLesson = await _repository.UpdateLessonAsync(id, existingLesson);
+                var updatedLesson = await _unitOfWork.KidLessonRepository.UpdateLessonAsync(id, existingLesson);
+                if (updatedLesson == null)
+                {
+                    _logger.LogWarning("Failed to update KidLesson with ID {Id} - repository returned null", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Successfully updated KidLesson with ID {Id}", id);
                 
-                return updatedLesson == null ? null : _mapper.Map<KidLessonDto>(updatedLesson);
+                return _mapper.Map<KidLessonDto>(updatedLesson);
             }
             catch (Exception ex)
             {
@@ -90,8 +119,16 @@ namespace Application.Services.Implementations.KidQuiz
         {
             try
             {
-                var lesson = await _repository.DeleteLessonAsync(id);
-                return lesson == null ? null : _mapper.Map<KidLessonDto>(lesson);
+                var deletedLesson = await _unitOfWork.KidLessonRepository.DeleteLessonAsync(id);
+                if (deletedLesson == null)
+                {
+                    _logger.LogWarning("KidLesson with ID {Id} not found for deletion", id);
+                    return null;
+                }
+
+                _logger.LogInformation("Successfully deleted KidLesson with ID {Id}", id);
+                
+                return deletedLesson;
             }
             catch (Exception ex)
             {

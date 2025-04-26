@@ -1,6 +1,7 @@
 ﻿using Application.Services.Implementations.Auth.JWT;
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Functions;
+using Application.Services.Interfaces.IRepository.KidQuiz;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.MainQuestions;
@@ -10,6 +11,7 @@ using Application.Services.Interfaces.IRepository.Profile;
 using Application.Services.Interfaces.IRepository.Pronunciation;
 using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Lesons;
+using Domain.Models;
 
 namespace Application.UnitOfWork
 {
@@ -50,6 +52,10 @@ namespace Application.UnitOfWork
         public IMaleNameRepository MaleNameRepository { get; }
 
         public IEnglishNameRepository EnglishNameRepository { get; }
+
+        public IKidLessonRepository KidLessonRepository{ get; }
+        
+        public IKidWordCardRepository KidWordCardRepository { get; }
 
         public IJwtService JwtService{ get; }
 

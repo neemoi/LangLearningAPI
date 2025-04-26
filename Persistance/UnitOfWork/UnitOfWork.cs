@@ -1,6 +1,7 @@
 ﻿using Application.Services.Implementations.Auth.JWT;
 using Application.Services.Interfaces.IRepository.Auth;
 using Application.Services.Interfaces.IRepository.Functions;
+using Application.Services.Interfaces.IRepository.KidQuiz;
 using Application.Services.Interfaces.IRepository.Lesons;
 using Application.Services.Interfaces.IRepository.Lessons;
 using Application.Services.Interfaces.IRepository.MainQuestions;
@@ -12,6 +13,7 @@ using Application.Services.Interfaces.IServices.Auth;
 using Application.Services.Interfaces.IServices.Lesons;
 using Application.UnitOfWork;
 using Infrastructure.Data;
+using Persistance.Repository.KidQuiz;
 
 namespace Persistance.UnitOfWork
 {
@@ -53,6 +55,10 @@ namespace Persistance.UnitOfWork
 
         public IEnglishNameRepository EnglishNameRepository { get; }
 
+        public IKidWordCardRepository KidWordCardRepository { get; }
+
+        public IKidLessonRepository KidLessonRepository {  get; }
+
         public IJwtService JwtService { get; }
 
         private readonly LanguageLearningDbContext LanguageLearningDbContext;
@@ -63,7 +69,8 @@ namespace Persistance.UnitOfWork
             IQuizQuestionRepository quizQuestionRepository, IUserProgressRepository userProgressRepository, IAlphabetLetterRepository alphabetLetterRepository,
             INounWordRepository nounWordRepository, IFunctionWordRepository functionWordRepository, IPartOfSpeechRepository partOfSpeechRepository,
             IPronunciationRepository pronunciationRepository, IMainQuestionRepository mainQuestionRepository, IFemaleNameRepository femaleNameRepository,
-            IMaleNameRepository maleNameRepository, IEnglishNameRepository englishNameRepository)
+            IMaleNameRepository maleNameRepository, IEnglishNameRepository englishNameRepository, IKidLessonRepository kidLessonRepository,
+            IKidWordCardRepository kidWordCardRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -85,6 +92,8 @@ namespace Persistance.UnitOfWork
             FemaleNameRepository = femaleNameRepository;
             MaleNameRepository = maleNameRepository;
             EnglishNameRepository = englishNameRepository;
+            KidLessonRepository = kidLessonRepository;
+            KidWordCardRepository = kidWordCardRepository;
         }
 
         public async Task SaveChangesAsync()

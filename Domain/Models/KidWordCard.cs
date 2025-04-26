@@ -14,5 +14,4 @@
 
         public KidLesson Lesson { get; set; } = null!;
     }
-
 }

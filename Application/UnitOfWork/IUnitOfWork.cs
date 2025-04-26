@@ -57,6 +57,8 @@ namespace Application.UnitOfWork
         
         public IKidWordCardRepository KidWordCardRepository { get; }
 
+        public IKidQuizQuestionRepository KidQuizQuestionRepository { get; }
+
         public IJwtService JwtService{ get; }
 
         Task SaveChangesAsync();

@@ -60,6 +60,8 @@ namespace Persistance.UnitOfWork
 
         public IKidQuizQuestionRepository KidQuizQuestionRepository { get; }
 
+        public IKidQuizAnswerRepository KidQuizAnswerRepository { get; }
+
         public IJwtService JwtService { get; }
 
         private readonly LanguageLearningDbContext LanguageLearningDbContext;
@@ -71,7 +73,8 @@ namespace Persistance.UnitOfWork
             INounWordRepository nounWordRepository, IFunctionWordRepository functionWordRepository, IPartOfSpeechRepository partOfSpeechRepository,
             IPronunciationRepository pronunciationRepository, IMainQuestionRepository mainQuestionRepository, IFemaleNameRepository femaleNameRepository,
             IMaleNameRepository maleNameRepository, IEnglishNameRepository englishNameRepository, IKidLessonRepository kidLessonRepository,
-            IKidWordCardRepository kidWordCardRepository, IKidQuizQuestionRepository kidQuizQuestionRepository, IKidQuizQuestionRepository kidQuizQuestionRepository1)
+            IKidWordCardRepository kidWordCardRepository, IKidQuizQuestionRepository kidQuizQuestionRepository, IKidQuizQuestionRepository kidQuizQuestionRepository1,
+            IKidQuizAnswerRepository kidQuizAnswerRepository)
         {
             LanguageLearningDbContext = languageLearningDbContext;
             AuthRepository = authRepository;
@@ -96,6 +99,7 @@ namespace Persistance.UnitOfWork
             KidLessonRepository = kidLessonRepository;
             KidWordCardRepository = kidWordCardRepository;
             KidQuizQuestionRepository = kidQuizQuestionRepository;
+            KidQuizAnswerRepository = kidQuizAnswerRepository;
         }
 
         public async Task SaveChangesAsync()

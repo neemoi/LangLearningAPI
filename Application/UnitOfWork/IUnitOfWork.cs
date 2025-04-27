@@ -58,6 +58,8 @@ namespace Application.UnitOfWork
         public IKidWordCardRepository KidWordCardRepository { get; }
 
         public IKidQuizQuestionRepository KidQuizQuestionRepository { get; }
+        
+        public IKidQuizAnswerRepository KidQuizAnswerRepository{ get; }
 
         public IJwtService JwtService{ get; }
 

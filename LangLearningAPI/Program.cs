@@ -115,7 +115,7 @@ internal class Program
             typeof(MappingLessonPhraseProfile), typeof(MappingUserProgressProfile), typeof(MappingNounsProfile),
             typeof(MappingFunctionWordProfile), typeof(MappingPronunciationMappingProfile), typeof(MappingMainQuestionProfile),
             typeof(MappingNameProfile), typeof(MappingKidLessonProfile), typeof(MappingKidWordCardProfile),
-            typeof(MappingKidQuizQuestionProfile));
+            typeof(MappingKidQuizQuestionProfile), typeof(MappingKidQuizAnswerProfile));
 
         builder.Services.AddScoped<IAuthRepository, AuthRepository>();
         builder.Services.AddScoped<IUserRepository, UserRepository>();
@@ -137,6 +137,7 @@ internal class Program
         builder.Services.AddScoped<IKidLessonRepository, KidLessonRepository>();
         builder.Services.AddScoped<IKidWordCardRepository, KidWordCardRepository>();
         builder.Services.AddScoped<IKidQuizQuestionRepository, KidQuizQuestionRepository>();
+        builder.Services.AddScoped<IKidQuizAnswerRepository, KidQuizAnswerRepository>();
         builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 
         builder.Services.Configure<JwtSettings>(builder.Configuration.GetSection("JwtSettings"));
@@ -161,6 +162,7 @@ internal class Program
         builder.Services.AddScoped<IKidLessonService, KidLessonService>();
         builder.Services.AddScoped<IKidWordCardService, KidWordCardService>();
         builder.Services.AddScoped<IKidQuizQuestionService, KidQuizQuestionService>();
+        builder.Services.AddScoped<IKidQuizAnswerService, KidQuizAnswerService>();
         builder.Services.AddScoped<KidLessonService>();  
 
         var app = builder.Build();
